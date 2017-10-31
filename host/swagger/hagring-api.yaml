@@ -1,0 +1,74 @@
+swagger: "2.0"
+
+info:
+  title: "{{title}}"
+  version: "1.0.0"
+
+basePath: /v1
+
+paths:
+  /models/new:
+    post:
+      summary: Upload new model
+      operationId: models.new
+      consumes:
+        - application/ubjson
+      parameters:
+        - in: body
+          name: user
+          description: The user to create.
+          schema:
+            type: object
+      responses:
+        201:
+          description: Created
+  /models/{modelID}:
+    put:
+      summary: Update model
+      operationId: models.update
+      consumes:
+        - application/ubjson
+      parameters:
+        - name: modelID
+          in: path
+          description: ID of the model to update
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: widget content
+          required: true
+          schema:
+            type: object
+      responses:
+        201:
+          description: Created
+    get:
+      summary: Update model
+      operationId: models.get
+      produces:
+        - application/json
+      parameters:
+        - name: modelID
+          in: path
+          description: ID of the model to update
+          required: true
+          type: string
+      responses:
+        201:
+          description: Created
+    delete:
+      summary: Delete model
+      operationId: models.delete
+      parameters:
+        - name: modelID
+          in: path
+          description: ID of the model to delete
+          required: true
+          type: string
+      responses:
+        200:
+          description: Deleted
+
+
+

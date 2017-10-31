@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+from hapi.dbmodels import Device
+from hapi import database
+
+database.init_db()
+
+#
+# create a some devices
+#
+session = database.db_session
+
+# some devices with short serial numbers
+for n in range(3):
+    session.add(Device(serialNo="A%s" % n))
+
+# a couple of devices with 'real' serial numbers
+session.add(Device(serialNo="AAA000004"))
+session.add(Device(serialNo="XXX000001"))
+session.add(Device(serialNo="XXX000002"))
+
+session.commit()

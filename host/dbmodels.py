@@ -26,8 +26,8 @@ class Model(Base):
 
     @staticmethod
     def from_dict(data):
-        return Model(name=Model.NAME,
-                     description=Model.DESC)
+        return Model(name=data[Model.NAME],
+                     description=data[Model.DESC])
 
     @staticmethod
     def get(id):

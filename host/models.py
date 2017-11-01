@@ -1,11 +1,7 @@
-import bson
 import flask
 from dbmodels import Model
 import database
-
-
-class ParseException(Exception):
-    pass
+import new_model
 
 
 def _invalid_model_resp(ex):
@@ -17,25 +13,13 @@ def _model_not_found_resp(modelID):
     return dict(message=msg), 404
 
 
-def _parse_model_bson(bson_bytes):
-    try:
-        mod_dict = bson.loads(bson_bytes)
-    except Exception:
-        raise ParseException("malformed bson data")
-
-    return mod_dict
-
-
 def new(model):
     try:
-        mod = Model.from_dict(_parse_model_bson(model))
-    except ParseException as e:
+        modID = new_model.add_model(model)
+    except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
 
-    database.db_session.add(mod)
-    database.db_session.commit()
-
-    return dict(model=mod.id)
+    return dict(model=modID)
 
 
 def update(modelID, body):

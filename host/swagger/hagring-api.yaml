@@ -22,7 +22,6 @@ paths:
           schema:
             type: object
       responses:
-        # TODO add 'invalid body payload' reply
         201:
           description: Created model's ID
           schema:
@@ -30,6 +29,11 @@ paths:
             properties:
               model:
                 type: string
+        400:
+          description: Error parsing request body
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
   /models/{modelID}:
     put:
       summary: Update model

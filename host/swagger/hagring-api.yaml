@@ -13,21 +13,29 @@ paths:
       operationId: models.new
       consumes:
         - application/ubjson
+      produces:
+        - application/json
       parameters:
         - in: body
-          name: user
-          description: The user to create.
+          name: model
+          description: Model data and description
           schema:
             type: object
       responses:
+        # TODO add 'invalid body payload' reply
         201:
-          description: Created
+          description: Created model's ID
+          schema:
+            type: object
+            properties:
+              model:
+                type: string
   /models/{modelID}:
     put:
       summary: Update model
       operationId: models.update
       consumes:
-        - application/ubjson
+        - application/json
       parameters:
         - name: modelID
           in: path
@@ -39,10 +47,10 @@ paths:
           description: widget content
           required: true
           schema:
-            type: object
+            $ref: '#/definitions/ModelStatus'
       responses:
-        201:
-          description: Created
+        204:
+          description: Model updated
     get:
       summary: Update model
       operationId: models.get
@@ -51,12 +59,14 @@ paths:
       parameters:
         - name: modelID
           in: path
-          description: ID of the model to update
+          description: ID of the model
           required: true
           type: string
       responses:
-        201:
-          description: Created
+        200:
+          description: Model status
+          schema:
+            $ref: '#/definitions/ModelStatus'
     delete:
       summary: Delete model
       operationId: models.delete
@@ -67,8 +77,62 @@ paths:
           required: true
           type: string
       responses:
-        200:
-          description: Deleted
+        204:
+          description: Model deleted
 
-
-
+definitions:
+  ModelUpdate:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      defaultPosition:
+        $ref: '#/definitions/Position'
+  ModelStatus:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      importStatus:
+        type: string
+        enum: [processing, done, failed]
+      defaultPosition:
+        $ref: '#/definitions/Position'
+  Position:
+    type: object
+    properties:
+      sweref99:
+        type: object
+        properties:
+          projection:
+            type: string
+            enum:
+            - TM
+            - 12_00
+            - 13_30
+            - 15_00
+            - 16_30
+            - 18_00
+            - 14_15
+            - 15_45
+            - 17_15
+            - 18_45
+            - 20_15
+            - 21_45
+            - 23_15
+          x:
+            type: number
+          y:
+            type: number
+          z:
+            type: number
+          roll:
+            type: number
+          pitch:
+            type: number
+          yaw:
+            type: number

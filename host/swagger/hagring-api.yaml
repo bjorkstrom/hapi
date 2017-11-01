@@ -36,6 +36,8 @@ paths:
       operationId: models.update
       consumes:
         - application/json
+      produces:
+        - application/json
       parameters:
         - name: modelID
           in: path
@@ -44,13 +46,17 @@ paths:
           type: string
         - name: body
           in: body
-          description: widget content
+          description: Model update description
           required: true
           schema:
-            $ref: '#/definitions/ModelStatus'
+            $ref: '#/definitions/ModelUpdate'
       responses:
         204:
           description: Model updated
+        404:
+          description: Model not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
     get:
       summary: Update model
       operationId: models.get
@@ -67,6 +73,11 @@ paths:
           description: Model status
           schema:
             $ref: '#/definitions/ModelStatus'
+        404:
+          description: Model not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
     delete:
       summary: Delete model
       operationId: models.delete
@@ -79,6 +90,10 @@ paths:
       responses:
         204:
           description: Model deleted
+        404:
+          description: Model not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
 
 definitions:
   ModelUpdate:
@@ -136,3 +151,8 @@ definitions:
             type: number
           yaw:
             type: number
+  ErrorResponse:
+    type: object
+    properties:
+      message:
+        type: string

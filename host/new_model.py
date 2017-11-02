@@ -27,10 +27,35 @@ MODEL_SCHEMA = {
         "data": {
             "type": "object",
             "properties": {
-                "filename": {"type" : "string"},
+                "filename": {"type": "string"},
                 # can't specify schema for 'content',
                 # as it's should be of 'bytes' type,
                 # don't think that's supported by json schema
+            },
+        },
+        "defaultPosition": {
+            "type": "object",
+            "properties": {
+                "sweref99": {
+                    "type": "object",
+                    "properties": {
+                        "projection": {
+                            "type": "string",
+                            "enum": [
+                                "TM", "12 00", "13 30", "15 00", "16 30",
+                                "18 00", "14 15", "15 45", "17 15", "18 45",
+                                "20 15", "21 45", "23 15",
+                            ],
+                        },
+                        "x": {"type": "number"},
+                        "y": {"type": "number"},
+                        "z": {"type": "number"},
+                        "roll": {"type": "number"},
+                        "pitch": {"type": "number"},
+                        "yaw": {"type": "number"},
+                    },
+                    "required": ["projection", "x", "y", "z"],
+                },
             },
         },
     },
@@ -70,6 +95,7 @@ def _validate_model_dic(model_dict):
 def add_model(model_bson):
     mod_dict = _parse_model_bson(model_bson)
     _validate_model_dic(mod_dict)
+
     mod = Model.from_dict(mod_dict)
 
     database.db_session.add(mod)

@@ -1,7 +1,10 @@
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey
+import enum
+from sqlalchemy import Column, Integer, String, Numeric, Enum, ForeignKey
 from sqlalchemy import orm
 from database import Base
 
+_ImportStat = enum.Enum("ImportStatus",
+                        "processing done failed")
 
 class Model(Base):
     __tablename__ = "models"
@@ -9,6 +12,7 @@ class Model(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     description = Column(String)
+    import_status = Column(Enum(_ImportStat))
 
     default_position_id = Column(Integer, ForeignKey("swerefPos.id"))
     default_position = orm.relationship("SwerefPos")
@@ -16,9 +20,12 @@ class Model(Base):
     # dictionary key names used for serialization
     NAME = "name"
     DESC = "description"
+    DEF_POS = "defaultPosition"
 
     def as_dict(self):
-        d = dict(name=self.name, description=self.description)
+        d = dict(name=self.name,
+                 description=self.description,
+                 importStatus=self.import_status.name)
 
         if self.default_position is not None:
             d["defaultPosition"] = dict(
@@ -36,12 +43,13 @@ class Model(Base):
     @staticmethod
     def from_dict(data):
         args = dict(name=data[Model.NAME],
-                     description=data[Model.DESC])
+                    description=data[Model.DESC],
+                    import_status=_ImportStat.processing)
 
         # add default position of specified
-        if "defaultPosition" in data:
+        if Model.DEF_POS in data:
             args["default_position"] = \
-                SwerefPos.from_dict(data["defaultPosition"]["sweref99"])
+                SwerefPos.from_dict(data[Model.DEF_POS]["sweref99"])
 
         return Model(**args)
 

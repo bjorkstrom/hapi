@@ -1,4 +1,16 @@
 #!/usr/bin/env python
 
 import database
+from dbmodels import Device
+
 database.init_db()
+
+#
+# create a some devices
+#
+session = database.db_session
+
+for n in range(3):
+    session.add(Device(serialNo="A%s" % n))
+
+session.commit()

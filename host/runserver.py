@@ -12,5 +12,6 @@ app.add_api("hagring-api.yaml",
 def shutdown_session(exception=None):
     database.db_session.remove()
 
+
 if __name__ == "__main__":
     app.run()

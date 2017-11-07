@@ -49,13 +49,13 @@ mod_insts = ModelInstances(modelInstances=[
     ModelInstance(name="inst2",
                   model=modelId),
 ])
-client.device.post_device_deviceSerialNo_models(
-    deviceSerialNo="A0", modelInstances=mod_insts).result()
+client.device.post_device_serialNo_models(
+    serialNo="A0", modelInstances=mod_insts).result()
 
 #
 # Get model instances
 #
-res = client.device.get_device_deviceSerialNo_models(deviceSerialNo="A0").result()
+res = client.device.get_device_serialNo_models(serialNo="A0").result()
 assert len(res.modelInstances) == 2
 for mod_inst in res.modelInstances:
     assert mod_inst.model == modelId
@@ -65,8 +65,8 @@ for mod_inst in res.modelInstances:
 # Delete model instances (by setting an empty set)
 #
 mod_insts = ModelInstances(modelInstances=[])
-client.device.post_device_deviceSerialNo_models(
-    deviceSerialNo="A0", modelInstances=mod_insts).result()
+client.device.post_device_serialNo_models(
+    serialNo="A0", modelInstances=mod_insts).result()
 
 #
 # Delete model
@@ -103,8 +103,8 @@ else:
 # Try to set model instances on a device that does not exist
 #
 try:
-    client.device.post_device_deviceSerialNo_models(
-        deviceSerialNo="NO_SUCH_DEVICE",
+    client.device.post_device_serialNo_models(
+        serialNo="NO_SUCH_DEVICE",
         modelInstances=ModelInstances(modelInstances=[])).result()
 except HTTPNotFound as e:
     err_msg = e.swagger_result.message
@@ -120,8 +120,8 @@ try:
         ModelInstance(name="inst1",
                       model=modelId)])
 
-    client.device.post_device_deviceSerialNo_models(
-        deviceSerialNo="A0", modelInstances=mod_insts).result()
+    client.device.post_device_serialNo_models(
+        serialNo="A0", modelInstances=mod_insts).result()
 except HTTPNotFound as e:
     err_msg = e.swagger_result.message
     assert err_msg.startswith("no model with id")

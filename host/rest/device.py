@@ -11,10 +11,10 @@ def _device_not_found_resp(serialNo):
 #
 # POST /device/{deviceSerialNo}/models
 #
-def post(deviceSerialNo, modelInstances):
-    device = Device.get(deviceSerialNo)
+def post(serialNo, modelInstances):
+    device = Device.get(serialNo)
     if device is None:
-        return _device_not_found_resp(deviceSerialNo)
+        return _device_not_found_resp(serialNo)
 
     session = database.db_session
 
@@ -36,10 +36,10 @@ def post(deviceSerialNo, modelInstances):
 #
 # GET /device/{deviceSerialNo}/models
 #
-def get(deviceSerialNo):
-    device = Device.get(deviceSerialNo)
+def get(serialNo):
+    device = Device.get(serialNo)
     if device is None:
-        return _device_not_found_resp(deviceSerialNo)
+        return _device_not_found_resp(serialNo)
 
     instances = []
     for mod_inst in device.model_instances:

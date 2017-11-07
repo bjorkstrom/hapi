@@ -97,13 +97,13 @@ paths:
           description: model not found
           schema:
             $ref: "#/definitions/ErrorResponse"
-  /device/{deviceSerialNo}/models:
+  /device/{serialNo}/models:
     post:
       summary: set active model instances on the device
       consumes:
         - application/json
       parameters:
-        - name: deviceSerialNo
+        - name: serialNo
           in: path
           description: device's serial number
           required: true
@@ -126,7 +126,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: deviceSerialNo
+        - name: serialNo
           in: path
           description: device's serial number
           required: true

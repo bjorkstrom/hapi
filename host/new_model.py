@@ -2,11 +2,16 @@
 # Handles uploads of new models
 #
 
-import bson
+import os
+from os import path
+import json
 import jsonschema
 import database
 from dbmodels import Model
 from jsonschema.exceptions import ValidationError
+
+
+MODEL_FILE_DIR = "model_files"
 
 
 class InvalidModel(Exception):
@@ -24,15 +29,6 @@ MODEL_SCHEMA = {
     {
         "name": {"type": "string"},
         "description": {"type": "string"},
-        "data": {
-            "type": "object",
-            "properties": {
-                "filename": {"type": "string"},
-                # can't specify schema for 'content',
-                # as it's should be of 'bytes' type,
-                # don't think that's supported by json schema
-            },
-        },
         "defaultPosition": {
             "type": "object",
             "properties": {
@@ -59,46 +55,42 @@ MODEL_SCHEMA = {
             },
         },
     },
-    "required": ["data"],
 }
 
 
-def _parse_model_bson(bson_bytes):
+def _parse_model_json(json_str):
     try:
-        mod_dict = bson.loads(bson_bytes)
+        mod_dict = json.loads(json_str)
     except Exception:
-        raise InvalidModel("malformed bson data")
+        raise InvalidModel("malformed json data")
 
     return mod_dict
-
-
-def _validate_content_field(data):
-    """
-    manually validate model["data"]["content"] field,
-    as we can't express required type with json schema
-    """
-    if "content" not in data:
-        raise InvalidModel("missing model.data.content field")
-
-    if not isinstance(data["content"], bytes):
-        raise InvalidModel("model.data.content field is not binary data")
 
 
 def _validate_model_dic(model_dict):
     try:
         jsonschema.validate(model_dict, MODEL_SCHEMA)
-        _validate_content_field(model_dict["data"])
     except ValidationError as e:
         raise InvalidModel("invalid model description: %s" % str(e))
 
 
-def add_model(model_bson):
-    mod_dict = _parse_model_bson(model_bson)
+def _save_file(modelFile, modelId):
+    os.makedirs(MODEL_FILE_DIR, exist_ok=True)
+
+    fpath = path.join(MODEL_FILE_DIR, "mod%s" % modelId)
+    with open(fpath, "wb") as f:
+        f.write(modelFile.read())
+
+
+def add_model(modelFile, model):
+    mod_dict = _parse_model_json(model)
     _validate_model_dic(mod_dict)
 
     mod = Model.from_dict(mod_dict)
 
     database.db_session.add(mod)
     database.db_session.commit()
+
+    _save_file(modelFile, mod.id)
 
     return mod.id

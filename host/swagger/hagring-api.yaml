@@ -12,15 +12,19 @@ paths:
       summary: Upload new model
       operationId: models.new
       consumes:
-        - application/ubjson
+      - "multipart/form-data"
       produces:
-        - application/json
+      - "application/json"
       parameters:
-        - in: body
-          name: model
-          description: Model data and description
-          schema:
-            type: object
+      - name: "model"
+        in: "formData"
+        description: "Model description and optional position"
+        type: string
+      - name: "modelFile"
+        in: "formData"
+        description: "The model's binary geometry"
+        required: true
+        type: "file"
       responses:
         201:
           description: Created model's ID
@@ -29,11 +33,12 @@ paths:
             properties:
               model:
                 type: string
+                format: binary
         400:
           description: Error parsing request body
           schema:
             $ref: '#/definitions/ErrorResponse'
-  /models/{modelID}:
+  /models/{modelId}:
     put:
       summary: Update model
       operationId: models.update
@@ -42,12 +47,12 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: modelID
+        - name: modelId
           in: path
           description: ID of the model to update
           required: true
           type: string
-        - name: body
+        - name: modelUpdate
           in: body
           description: Model update description
           required: true
@@ -66,7 +71,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: modelID
+        - name: modelId
           in: path
           description: ID of the model
           required: true
@@ -84,7 +89,7 @@ paths:
       summary: Delete model
       operationId: models.delete
       parameters:
-        - name: modelID
+        - name: modelId
           in: path
           description: ID of the model to delete
           required: true
@@ -111,6 +116,7 @@ paths:
         - in: body
           name: modelInstances
           description: TBD
+          required: true
           schema:
             $ref: '#/definitions/ModelInstances'
       responses:
@@ -136,7 +142,6 @@ paths:
           description: Device or Model not found
           schema:
             $ref: '#/definitions/ErrorResponse'
-
 
 definitions:
   ModelInstances:

@@ -13,38 +13,38 @@ def _model_not_found_resp(modelID):
     return dict(message=msg), 404
 
 
-def new(model):
+def new(modelFile, model):
     try:
-        modID = new_model.add_model(model)
+        modID = new_model.add_model(modelFile, model)
     except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
 
-    return dict(model=modID)
+    return dict(model=str(modID)), 201
 
 
-def update(modelID, body):
-    mod = Model.get(modelID)
+def update(modelId, modelUpdate):
+    mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelID)
+        return _model_not_found_resp(modelId)
 
-    mod.update(body)
+    mod.update(modelUpdate)
     database.db_session.commit()
 
     return flask.Response(status=204)
 
 
-def get(modelID):
-    mod = Model.get(modelID)
+def get(modelId):
+    mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelID)
+        return _model_not_found_resp(modelId)
 
-    return Model.get(modelID).as_dict()
+    return mod.as_dict()
 
 
-def delete(modelID):
-    mod = Model.get(modelID)
+def delete(modelId):
+    mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelID)
+        return _model_not_found_resp(modelId)
 
     database.db_session.delete(mod)
     database.db_session.commit()

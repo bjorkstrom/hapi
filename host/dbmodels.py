@@ -110,12 +110,10 @@ class Model(Base):
     default_position = orm.relationship("SwerefPos")
 
     def as_dict(self):
-        # TODO don't include optional fields when
-        # thier value is None (in the database so to speak)
+        d = dict(importStatus=self.import_status.name)
 
-        d = dict(name=self.name,
-                 description=self.description,
-                 importStatus=self.import_status.name)
+        _add_if_not_none(d, "name", self.name)
+        _add_if_not_none(d, "description", self.description)
 
         if self.default_position is not None:
             d["defaultPosition"] = dict(
@@ -132,8 +130,8 @@ class Model(Base):
 
     @staticmethod
     def from_dict(data):
-        args = dict(name=data[NAME],
-                    description=data[DESC],
+        args = dict(name=data.get(NAME),
+                    description=data.get(DESC),
                     import_status=_ImportStat.processing)
 
         # add default position of specified

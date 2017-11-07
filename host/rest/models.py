@@ -1,23 +1,16 @@
 import database
 import flask
 from dbmodels import Model
-from . import new_model
+from . import new_model, util
 
 
 def _invalid_model_resp(ex):
     return dict(message=str(ex)), 400
 
-
-def _model_not_found_resp(modelID):
-    msg = "No model with id '%s' exists" % modelID
-    return dict(message=msg), 404
-
-
 #
 # POST /models/new
 #
 def post(modelFile, model):
-    print("at new_model")
     try:
         modID = new_model.add_model(modelFile, model)
     except new_model.InvalidModel as e:
@@ -31,7 +24,7 @@ def post(modelFile, model):
 def put(modelId, modelUpdate):
     mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelId)
+        return util.model_not_found_resp(modelId)
 
     mod.update(modelUpdate)
     database.db_session.commit()
@@ -45,7 +38,7 @@ def put(modelId, modelUpdate):
 def get(modelId):
     mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelId)
+        return util.model_not_found_resp(modelId)
 
     return mod.as_dict()
 
@@ -55,7 +48,7 @@ def get(modelId):
 def delete(modelId):
     mod = Model.get(modelId)
     if mod is None:
-        return _model_not_found_resp(modelId)
+        return util.model_not_found_resp(modelId)
 
     database.db_session.delete(mod)
     database.db_session.commit()

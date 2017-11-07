@@ -80,7 +80,7 @@ try:
     client.models.delete_models_modelId(modelId=modelId).result()
 except HTTPNotFound as e:
     err_msg = e.swagger_result.message
-    assert err_msg == ("No model with id '%s' exists" % modelId)
+    assert err_msg == ("no model with id '%s' exists" % modelId)
 else:
     assert False, "NO EXCEPTION"
 
@@ -96,5 +96,34 @@ try:
 except HTTPBadRequest as e:
     err_msg = e.swagger_result.message
     assert err_msg.startswith("invalid model description: 3 is not of type 'string'")
+else:
+    assert False, "NO EXCEPTION"
+
+#
+# Try to set model instances on a device that does not exist
+#
+try:
+    client.device.post_device_deviceSerialNo_models(
+        deviceSerialNo="NO_SUCH_DEVICE",
+        modelInstances=ModelInstances(modelInstances=[])).result()
+except HTTPNotFound as e:
+    err_msg = e.swagger_result.message
+    assert err_msg.startswith("no device")
+else:
+    assert False, "NO EXCEPTION"
+
+#
+# Try to use non-existing model ID when creating instances
+#
+try:
+    mod_insts = ModelInstances(modelInstances=[
+        ModelInstance(name="inst1",
+                      model=modelId)])
+
+    client.device.post_device_deviceSerialNo_models(
+        deviceSerialNo="A0", modelInstances=mod_insts).result()
+except HTTPNotFound as e:
+    err_msg = e.swagger_result.message
+    assert err_msg.startswith("no model with id")
 else:
     assert False, "NO EXCEPTION"

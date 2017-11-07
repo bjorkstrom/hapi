@@ -8,6 +8,8 @@ app = connexion.FlaskApp(__name__, port=9090, specification_dir="swagger/")
 app.add_api("hagring-api.yaml",
             validate_responses=True,
             resolver=resolver.RestyResolver("rest"),
+            # TODO disable swagger UI in production?
+            # swagger_ui=False
             arguments=dict(title="Hägring Cloud"))
 
 @app.app.teardown_appcontext

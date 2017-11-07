@@ -18,6 +18,11 @@ SWRREF99 = "sweref99"
 DEF_POS = "defaultPosition"
 
 
+class ModelNotFound(Exception):
+    def __init__(self, modelId):
+        self.modelId = modelId
+
+
 class Device(Base):
     __tablename__ = "devices"
 
@@ -84,7 +89,7 @@ class ModelInstance(Base):
         modId = data[MODEL]
         mod = Model.get(modId)
         if mod is None:
-            raise Exception("no model with id %s exists" % modId)
+            raise ModelNotFound(modId)
 
         args = dict(
             name=data.get(NAME),

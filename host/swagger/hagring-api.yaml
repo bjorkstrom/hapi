@@ -9,21 +9,21 @@ basePath: /v1
 paths:
   /models/new:
     post:
-      summary: Upload new model
+      summary: upload new model
       consumes:
-      - "multipart/form-data"
+      - multipart/form-data
       produces:
-      - "application/json"
+      - application/json
       parameters:
-      - name: "model"
-        in: "formData"
-        description: "Model description and optional position"
+      - name: model
+        in: formData
+        description: model description and optional position
         type: string
-      - name: "modelFile"
-        in: "formData"
-        description: "The model's binary geometry"
+      - name: modelFile
+        in: formData
+        description: the model's binary geometry
         required: true
-        type: "file"
+        type: file
       responses:
         201:
           description: Created model's ID
@@ -36,7 +36,7 @@ paths:
         400:
           description: Error parsing request body
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: "#/definitions/ErrorResponse"
   /models/{modelId}:
     put:
       summary: Update model
@@ -55,16 +55,16 @@ paths:
           description: Model update description
           required: true
           schema:
-            $ref: '#/definitions/ModelUpdate'
+            $ref: "#/definitions/ModelUpdate"
       responses:
         204:
           description: Model updated
         404:
           description: Model not found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: "#/definitions/ErrorResponse"
     get:
-      summary: Update model
+      summary: get model description and import status
       produces:
         - application/json
       parameters:
@@ -75,15 +75,15 @@ paths:
           type: string
       responses:
         200:
-          description: Model status
+          description: model's description and status
           schema:
-            $ref: '#/definitions/ModelStatus'
+            $ref: "#/definitions/ModelStatus"
         404:
           description: Model not found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: "#/definitions/ErrorResponse"
     delete:
-      summary: Delete model
+      summary: delete model
       parameters:
         - name: modelId
           in: path
@@ -92,50 +92,54 @@ paths:
           type: string
       responses:
         204:
-          description: Model deleted
+          description: model deleted
         404:
-          description: Model not found
+          description: model not found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: "#/definitions/ErrorResponse"
   /device/{deviceSerialNo}/models:
     post:
-      summary: Set active model instances on the device
+      summary: set active model instances on the device
       consumes:
         - application/json
       parameters:
         - name: deviceSerialNo
           in: path
-          description: ID of the model to update
+          description: device's serial number
           required: true
           type: string
         - in: body
           name: modelInstances
-          description: TBD
+          description: model instances to create
           required: true
           schema:
-            $ref: '#/definitions/ModelInstances'
+            $ref: "#/definitions/ModelInstances"
       responses:
         204:
-          description: Model instances successfully created
+          description: model instances successfully created
+        404:
+          description: device or model not found
+          schema:
+            $ref: "#/definitions/ErrorResponse"
     get:
-      summary: Get active model instances on the device
+      summary: get active model instances on the device
       produces:
         - application/json
       parameters:
         - name: deviceSerialNo
           in: path
-          description: ID of the model to update
+          description: device's serial number
           required: true
           type: string
       responses:
         200:
-          description: Current model instances on the device
+          description: current model instances on the device
           schema:
-            $ref: '#/definitions/ModelInstances'
+            $ref: "#/definitions/ModelInstances"
         404:
-          description: Device or Model not found
+          description: device or model not found
           schema:
-            $ref: '#/definitions/ErrorResponse'
+            $ref: "#/definitions/ErrorResponse"
 
 definitions:
   ModelInstances:
@@ -144,7 +148,7 @@ definitions:
       modelInstances:
         type: array
         items:
-          $ref: '#/definitions/ModelInstance'
+          $ref: "#/definitions/ModelInstance"
   ModelInstance:
     type: object
     properties:
@@ -157,7 +161,7 @@ definitions:
       hidden:
         type: boolean
       position:
-        $ref: '#/definitions/Position'
+        $ref: "#/definitions/Position"
     required: [model]
   ModelUpdate:
     type: object
@@ -167,7 +171,7 @@ definitions:
       description:
         type: string
       defaultPosition:
-        $ref: '#/definitions/Position'
+        $ref: "#/definitions/Position"
   ModelStatus:
     type: object
     properties:
@@ -179,7 +183,7 @@ definitions:
         type: string
         enum: [processing, done, failed]
       defaultPosition:
-        $ref: '#/definitions/Position'
+        $ref: "#/definitions/Position"
   Position:
     type: object
     properties:

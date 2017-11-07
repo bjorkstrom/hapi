@@ -7,8 +7,11 @@ def _device_not_found_resp(serialNo):
     msg = "no device with serial number '%s' exists" % serialNo
     return dict(message=msg), 404
 
-
-def set(deviceSerialNo, modelInstances):
+#
+# POST /device/{deviceSerialNo}/models
+#
+def post(deviceSerialNo, modelInstances):
+    print("POST DEV INST")
     device = Device.get(deviceSerialNo)
     if device is None:
         return _device_not_found_resp(deviceSerialNo)
@@ -26,7 +29,9 @@ def set(deviceSerialNo, modelInstances):
 
     return flask.Response(status=204)
 
-
+#
+# GET /device/{deviceSerialNo}/models
+#
 def get(deviceSerialNo):
     device = Device.get(deviceSerialNo)
     if device is None:

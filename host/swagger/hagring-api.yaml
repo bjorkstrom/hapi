@@ -10,7 +10,6 @@ paths:
   /models/new:
     post:
       summary: Upload new model
-      operationId: models.new
       consumes:
       - "multipart/form-data"
       produces:
@@ -41,7 +40,6 @@ paths:
   /models/{modelId}:
     put:
       summary: Update model
-      operationId: models.update
       consumes:
         - application/json
       produces:
@@ -67,7 +65,6 @@ paths:
             $ref: '#/definitions/ErrorResponse'
     get:
       summary: Update model
-      operationId: models.get
       produces:
         - application/json
       parameters:
@@ -87,7 +84,6 @@ paths:
             $ref: '#/definitions/ErrorResponse'
     delete:
       summary: Delete model
-      operationId: models.delete
       parameters:
         - name: modelId
           in: path
@@ -104,7 +100,6 @@ paths:
   /device/{deviceSerialNo}/models:
     post:
       summary: Set active model instances on the device
-      operationId: instances.set
       consumes:
         - application/json
       parameters:
@@ -124,7 +119,6 @@ paths:
           description: Model instances successfully created
     get:
       summary: Get active model instances on the device
-      operationId: instances.get
       produces:
         - application/json
       parameters:

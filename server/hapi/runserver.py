@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import connexion
-import database
 from connexion import resolver
+from hapi import database
 
 app = connexion.FlaskApp(__name__, port=9090, specification_dir="swagger/")
 app.add_api("hagring-api.yaml",
             validate_responses=True,
-            resolver=resolver.RestyResolver("rest"),
+            resolver=resolver.RestyResolver("hapi.rest"),
             # TODO disable swagger UI in production?
             # swagger_ui=False
             arguments=dict(title="Hägring Cloud"))

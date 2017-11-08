@@ -1,7 +1,8 @@
 import enum
+
+from hapi.database import Base
 from sqlalchemy import Column, Integer, String, Numeric, Boolean
 from sqlalchemy import Enum, ForeignKey, orm
-from database import Base
 
 _ImportStat = enum.Enum("ImportStatus",
                         "processing done failed")

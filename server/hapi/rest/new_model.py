@@ -2,14 +2,14 @@
 # Handles uploads of new models
 #
 
+import json
 import os
 from os import path
-import json
-import jsonschema
-import database
-from dbmodels import Model
-from jsonschema.exceptions import ValidationError
 
+import jsonschema
+from hapi.dbmodels import Model
+from hapi import database
+from jsonschema.exceptions import ValidationError
 
 MODEL_FILE_DIR = "model_files"
 

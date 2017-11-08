@@ -7,3 +7,7 @@ for DELETE /models/{modelId}
 
  don't allow to delete models that are instanciated on devices
 
+rename hagring-api.yaml -> hagring.yaml
+
+rename host/ to server/
+

@@ -2,9 +2,10 @@
 import setuptools
 
 setuptools.setup(
-    name = "hrapi",
+    name="hapi",
+    packages=["hapi", "hapi.rest"],
+    package_data={"hapi": ["swagger/*"]},
     install_requires = {
-        "bson==0.5.0",
         "connexion==1.1.16",
         "SQLAlchemy==1.1.15",
         "jsonschema==2.6.0",

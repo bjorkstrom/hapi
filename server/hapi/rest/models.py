@@ -1,6 +1,7 @@
-import database
 import flask
-from dbmodels import Model
+from hapi.dbmodels import Model
+from hapi import database
+
 from . import new_model, util
 
 

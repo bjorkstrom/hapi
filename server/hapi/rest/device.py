@@ -1,7 +1,8 @@
 import flask
-import database
-from dbmodels import Device, ModelInstance, ModelNotFound
-from . import new_model, util
+from hapi.dbmodels import Device, ModelInstance, ModelNotFound
+from hapi import database
+
+from . import util
 
 
 def _device_not_found_resp(serialNo):

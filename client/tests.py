@@ -6,6 +6,16 @@ import json
 
 client = SwaggerClient.from_url("http://localhost:9090/v1/swagger.json")
 
+#from bravado.requests_client import RequestsClient
+#http_client = RequestsClient()
+#http_client.set_basic_auth(
+#    "ncc.brab.ws",
+#    "root", "????"
+#)
+
+#client = SwaggerClient.from_url("https://ncc.brab.ws/v1/swagger.json",
+#                                http_client=http_client)
+
 #
 # Create new model
 #

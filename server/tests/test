@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#
+# run tests using the python's unittest module
+#
+# this is a convinience wrapper around 'python -m unittest' command
+#
+python -m unittest $@

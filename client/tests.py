@@ -19,7 +19,18 @@ client = SwaggerClient.from_url("http://localhost:9090/v1/swagger.json")
 #
 # Create new model
 #
-mod_dict = dict(name="myModel")
+mod_dict = {
+        "name": "my model",
+        "description": "my new model",
+        "defaultPosition": {
+            "sweref99": {
+                "projection": "18 00",
+                "x": 6175471.9873,
+                "y": 300000.1234,
+                "z": 68.0223,
+            },
+        },
+    }
 res = client.models.post_models_new(modelFile="dummy_data",
                                     # modelFile=("myfile", "dummy_data"),
                                     model=json.dumps(mod_dict)).result()
@@ -29,8 +40,8 @@ modelId = res["model"]
 # Get created model
 #
 res = client.models.get_models_modelId(modelId=modelId).result()
-assert res.name == "myModel"
-assert res.description is None
+assert res.name == "my model"
+assert res.description == "my new model"
 
 #
 # Update model

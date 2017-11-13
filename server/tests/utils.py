@@ -4,6 +4,8 @@ Client = SwaggerClient.from_url("http://localhost:9090/v1/swagger.json")
 
 ModelInstances = Client.get_model("ModelInstances")
 ModelInstance = Client.get_model("ModelInstance")
+ModelStatus = Client.get_model("ModelStatus")
+Position = Client.get_model("Position")
 
 
 class ErrorReqMixin:

@@ -32,7 +32,6 @@ paths:
             properties:
               model:
                 type: string
-                format: binary
         400:
           description: Error parsing request body
           schema:

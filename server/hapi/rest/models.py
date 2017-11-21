@@ -22,6 +22,14 @@ def post(modelFile, model):
 
 
 #
+# GET /models
+#
+def search():
+    models = [dict(model=str(m.id)) for m in Model.all()]
+    return dict(models=models)
+
+
+#
 # PUT /models/{modelId}
 #
 def put(modelId, modelUpdate):

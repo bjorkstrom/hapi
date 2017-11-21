@@ -36,6 +36,16 @@ paths:
           description: Error parsing request body
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /models:
+    get:
+      summary: get all uploaded model's IDs
+      produces:
+      - application/json
+      responses:
+        200:
+          description: devices
+          schema:
+            $ref: "#/definitions/Models"
   /models/{modelId}:
     put:
       summary: Update model
@@ -151,6 +161,19 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
 definitions:
+  Models:
+    type: object
+    properties:
+      models:
+        type: array
+        items:
+          $ref: "#/definitions/Model"
+  Model:
+    type: object
+    properties:
+      model:
+        type: string
+    required: [model]
   Devices:
     type: object
     properties:

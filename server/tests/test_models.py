@@ -66,6 +66,17 @@ class TestModel(unittest.TestCase, ModelMakerMixin):
                                      defaultPosition=self.DEF_POS,
                                      importStatus="processing"))
 
+    def test_get_all(self):
+        """
+        test getting all models
+        """
+        res = Client.models.get_models().result()
+
+        # validate result by checking that created model's ID is
+        # included into the results
+        mod_ids = [m.model for m in res.models]
+        self.assertIn(self.modelId, mod_ids)
+
     def test_update(self):
         """
         Test updating a model

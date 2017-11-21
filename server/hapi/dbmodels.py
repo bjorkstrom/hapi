@@ -155,6 +155,10 @@ class Model(Base):
         return Model(**args)
 
     @staticmethod
+    def all():
+        return Model.query.all()
+
+    @staticmethod
     def get(id):
         return Model.query.filter(Model.id == id).first()
 

@@ -96,6 +96,16 @@ paths:
           description: model not found
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /devices:
+    get:
+      summary: get all devices
+      produces:
+        - application/json
+      responses:
+        200:
+          description: devices
+          schema:
+            $ref: "#/definitions/Devices"
   /device/{serialNo}/models:
     post:
       summary: set active model instances on the device
@@ -141,6 +151,19 @@ paths:
             $ref: "#/definitions/ErrorResponse"
 
 definitions:
+  Devices:
+    type: object
+    properties:
+      devices:
+        type: array
+        items:
+          $ref: "#/definitions/Device"
+  Device:
+    type: object
+    properties:
+      serialNo:
+        type: string
+    required: [serialNo]
   ModelInstances:
     type: object
     properties:

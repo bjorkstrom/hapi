@@ -158,3 +158,18 @@ class TestInstances(unittest.TestCase, ModelMakerMixin):
         # check that model instances list is empty
         res = Client.device.get_device_serialNo_models(serialNo=TEST_DEVICE).result()
         self.assertEqual(res, ModelInstances(modelInstances=[]))
+
+
+class TestDevices(unittest.TestCase):
+    def test_get(self):
+        res = Client.devices.get_devices().result()
+
+        # do a simple validation of the results,
+        # where we assume that XXX000001 and XXX000002
+        # devices are in the database
+        #
+        # TODO: make a proper validation by crosschecking with database
+        # TODO: or by adding some known devices to the database
+        serNums = [d.serialNo for d in res.devices]
+        self.assertIn("XXX000001", serNums)
+        self.assertIn("XXX000002", serNums)

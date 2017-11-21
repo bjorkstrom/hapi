@@ -31,6 +31,13 @@ class Device(Base):
 
     model_instances = orm.relationship("ModelInstance")
 
+    def as_dict(self):
+        return dict(serialNo=self.serialNo)
+
+    @staticmethod
+    def all():
+        return Device.query.all()
+
     @staticmethod
     def get(serialNo):
         return Device.query.filter(Device.serialNo == serialNo).first()

@@ -5,4 +5,10 @@
 #
 # this is a convinience wrapper around 'python -m unittest' command
 #
-python -m unittest $@
+tests="$@"
+if test "$#" -ne 1; then
+    # no tests specified, run all tests
+    # that we can discover
+    tests=discover
+fi
+python -m unittest $tests

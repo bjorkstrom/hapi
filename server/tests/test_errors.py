@@ -14,6 +14,13 @@ class TestNotFoundResp(unittest.TestCase, utils.ErrorReqMixin):
 
         self._assert_error_msg(cm.exception, "no model with id 'XXX' exists")
 
+    def test_put_nonexistent_model(self):
+        with self.assertRaises(HTTPNotFound) as cm:
+            Client.models.put_models_modelId(modelId="ZZZ",
+                                             modelUpdate=dict()).result()
+
+        self._assert_error_msg(cm.exception, "no model with id 'ZZZ' exists")
+
     def test_delete_nonexistent_model(self):
         with self.assertRaises(HTTPNotFound) as cm:
             Client.models.delete_models_modelId(modelId="ABC").result()
@@ -21,13 +28,21 @@ class TestNotFoundResp(unittest.TestCase, utils.ErrorReqMixin):
         self._assert_error_msg(cm.exception, "no model with id 'ABC' exists")
 
     def test_get_nonexistent_dev_instances(self):
-
         with self.assertRaises(HTTPNotFound) as cm:
-            Client.device.post_device_serialNo_models(
-                serialNo="XXX",
-                modelInstances=ModelInstances(modelInstances=[])).result()
+            Client.device.get_device_serialNo_models(serialNo="XXX").result()
 
         self._assert_error_msg(cm.exception, "no device with serial number 'XXX' exists")
+
+    def test_set_nonexistent_dev_instances(self):
+        """
+        test setting model instances on a non-existing device
+        """
+        with self.assertRaises(HTTPNotFound) as cm:
+            Client.device.post_device_serialNo_models(
+                serialNo="UK",
+                modelInstances=ModelInstances(modelInstances=[])).result()
+
+        self._assert_error_msg(cm.exception, "no device with serial number 'UK' exists")
 
     def test_set_instance_nonexistent_model_id(self):
         mod_insts = ModelInstances(

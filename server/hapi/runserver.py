@@ -12,6 +12,7 @@ app.add_api("hagring.yaml",
             # swagger_ui=False
             arguments=dict(title="Hägring Cloud"))
 
+
 @app.app.teardown_appcontext
 def shutdown_session(exception=None):
     database.db_session.remove()

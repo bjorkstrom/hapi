@@ -9,6 +9,7 @@ def _device_not_found_resp(serialNo):
     msg = "no device with serial number '%s' exists" % serialNo
     return dict(message=msg), 404
 
+
 #
 # POST /device/{deviceSerialNo}/models
 #
@@ -25,14 +26,15 @@ def post(serialNo, modelInstances):
 
     try:
         for mod_inst in modelInstances["modelInstances"]:
-           session.add(ModelInstance.from_dict(device, mod_inst))
+            session.add(ModelInstance.from_dict(device, mod_inst))
     except ModelNotFound as e:
-        session.expunge_all() # don't write any changes to the database
+        session.expunge_all()  # don't write any changes to the database
         return util.model_not_found_resp(e.modelId)
 
     session.commit()
 
     return flask.Response(status=204)
+
 
 #
 # GET /device/{deviceSerialNo}/models

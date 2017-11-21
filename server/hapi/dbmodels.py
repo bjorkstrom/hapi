@@ -177,13 +177,13 @@ class SwerefPos(Base):
     @staticmethod
     def from_dict(data):
         return SwerefPos(
-            projection = data["projection"],
-            x = data["x"],
-            y = data["y"],
-            z = data["z"],
-            roll = data.get("roll", 0),
-            pitch = data.get("pitch", 0),
-            yaw = data.get("yaw", 0))
+            projection=data["projection"],
+            x=data["x"],
+            y=data["y"],
+            z=data["z"],
+            roll=data.get("roll", 0),
+            pitch=data.get("pitch", 0),
+            yaw=data.get("yaw", 0))
 
     def as_dict(self):
         return dict(
@@ -194,5 +194,3 @@ class SwerefPos(Base):
             roll=self.roll,
             pitch=self.pitch,
             yaw=self.yaw)
-
-        return d

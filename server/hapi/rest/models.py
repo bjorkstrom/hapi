@@ -8,6 +8,7 @@ from . import new_model, util
 def _invalid_model_resp(ex):
     return dict(message=str(ex)), 400
 
+
 #
 # POST /models/new
 #
@@ -18,6 +19,7 @@ def post(modelFile, model):
         return _invalid_model_resp(e)
 
     return dict(model=str(modID)), 201
+
 
 #
 # PUT /models/{modelId}
@@ -43,6 +45,7 @@ def get(modelId):
 
     return mod.as_dict()
 
+
 #
 # DELETE /models/{modelId}
 #
@@ -55,4 +58,3 @@ def delete(modelId):
     database.db_session.commit()
 
     return flask.Response(status=204)
-

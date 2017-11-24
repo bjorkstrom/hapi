@@ -6,6 +6,9 @@ ModelInstances = Client.get_model("ModelInstances")
 ModelInstance = Client.get_model("ModelInstance")
 ModelStatus = Client.get_model("ModelStatus")
 Position = Client.get_model("Position")
+EventSubscription = Client.get_model("EventSubscription")
+EventFilter = Client.get_model("EventFilter")
+RestEndpoint = Client.get_model("RestEndpoint")
 
 
 class ErrorReqMixin:

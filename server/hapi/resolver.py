@@ -34,6 +34,12 @@ OPS_MAP = {
         "device.post",
     ("delete", "/models/{modelId}"):
         "models.delete",
+    ("post", "/device/{serialNo}/events-subscriptions/new"):
+        "subscription.new",
+    ("post", "/device/{serialNo}/events-subscriptions/{subscriptionID}"):
+        "subscription.renew",
+    ("delete", "/device/{serialNo}/events-subscriptions/{subscriptionID}"):
+        "subscription.cancel",
 }
 
 

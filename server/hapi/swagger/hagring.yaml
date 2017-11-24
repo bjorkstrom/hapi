@@ -159,8 +159,118 @@ paths:
           description: device or model not found
           schema:
             $ref: "#/definitions/ErrorResponse"
+  /device/{serialNo}/events-subscriptions/new:
+    post:
+      summary: create new events subscription
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: serialNo
+          in: path
+          description: device's serial number
+          required: true
+          type: string
+        - name: Subscription
+          in: body
+          description: Model update description
+          required: true
+          schema:
+            $ref: "#/definitions/EventSubscription"
+      responses:
+        200:
+          description: created event subscription information
+          schema:
+            $ref: "#/definitions/CreatedEventSubscription"
+  /device/{serialNo}/events-subscriptions/{subscriptionID}:
+    post:
+      summary: renew subscription
+      consumes:
+        - application/json
+      parameters:
+        - name: serialNo
+          in: path
+          description: device's serial number
+          required: true
+          type: string
+        - name: subscriptionID
+          in: path
+          description: event subscription's ID
+          required: true
+          type: string
+        - name: subscription
+          in: body
+          description: Model update description
+          required: true
+          schema:
+            type: object
+            properties:
+              duration:
+                type: number
+      responses:
+        204:
+          description: duration updated
+    delete:
+      summary: cancel event subscription
+      parameters:
+        - name: serialNo
+          in: path
+          description: device's serial number
+          required: true
+          type: string
+        - name: subscriptionID
+          in: path
+          description: event subscription's ID
+          required: true
+          type: string
+      responses:
+        204:
+          description: subscription canceled
+
 
 definitions:
+  CreatedEventSubscription:
+    type: object
+    properties:
+      subscriptionID:
+        type: string
+  EventSubscription:
+    type: object
+    properties:
+      duration:
+        type: number
+      eventFilters:
+        type: array
+        items:
+          $ref: "#/definitions/EventFilter"
+      destination:
+        type: object
+        properties:
+          restEndpoint:
+            $ref: "#/definitions/RestEndpoint"
+  EventFilter:
+    type: object
+    properties:
+      topic:
+        type: string
+  RestEndpoint:
+    type: object
+    properties:
+      URL:
+        type: string
+      method:
+        type: string
+        enum: [POST]
+      headers:
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            value:
+              type: string
   Models:
     type: object
     properties:

@@ -11,7 +11,7 @@ def _device_not_found_resp(serialNo):
 
 
 #
-# POST /device/{deviceSerialNo}/models
+# POST /device/{serialNo}/models
 #
 def post(serialNo, modelInstances):
     device = Device.get(serialNo)
@@ -37,7 +37,7 @@ def post(serialNo, modelInstances):
 
 
 #
-# GET /device/{deviceSerialNo}/models
+# GET /device/{serialNo}/models
 #
 def get(serialNo):
     device = Device.get(serialNo)

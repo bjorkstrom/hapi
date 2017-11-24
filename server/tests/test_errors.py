@@ -31,7 +31,8 @@ class TestNotFoundResp(unittest.TestCase, utils.ErrorReqMixin):
         with self.assertRaises(HTTPNotFound) as cm:
             Client.device.get_device_serialNo_models(serialNo="XXX").result()
 
-        self._assert_error_msg(cm.exception, "no device with serial number 'XXX' exists")
+        self._assert_error_msg(cm.exception,
+                               "no device with serial number 'XXX' exists")
 
     def test_set_nonexistent_dev_instances(self):
         """
@@ -42,7 +43,8 @@ class TestNotFoundResp(unittest.TestCase, utils.ErrorReqMixin):
                 serialNo="UK",
                 modelInstances=ModelInstances(modelInstances=[])).result()
 
-        self._assert_error_msg(cm.exception, "no device with serial number 'UK' exists")
+        self._assert_error_msg(cm.exception,
+                               "no device with serial number 'UK' exists")
 
     def test_set_instance_nonexistent_model_id(self):
         mod_insts = ModelInstances(

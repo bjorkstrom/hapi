@@ -36,7 +36,8 @@ class TestSubscriptions(unittest.TestCase):
 
     def test_cancel(self):
         # TODO: create subscription before renewing
-        Client.device.delete_device_serialNo_events_subscriptions_subscriptionID(
+        dev = Client.device
+        dev.delete_device_serialNo_events_subscriptions_subscriptionID(
             serialNo="A0",
             subscriptionID="XXX",
         ).result()

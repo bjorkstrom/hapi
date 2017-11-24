@@ -16,6 +16,4 @@ class ErrorReqMixin:
         self.assertEqual(exception.swagger_result.message, err_msg)
 
     def _assert_error_msg_contains(self, exception, err_msg_part):
-        self.assertIn(err_msg_part, exception.swagger_result.message, )
-
-
+        self.assertIn(err_msg_part, exception.swagger_result.message)

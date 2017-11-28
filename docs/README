@@ -1,0 +1,47 @@
+Hägring API
+-----------
+
+The Hägring API documentation is build by combining manually written text and
+text auto-generated from the swagger specification file. The swagger2markup-cli
+tools is used to generated asciidoc documents from the swagger specification.
+The as asciidoc tool is used to combine manually written and auto-generated
+documents into the final HTML document. See below on how to install the
+required tools.
+
+Building documents
+..................
+
+run
+
+    make
+
+this will generated the index.html file.
+
+
+Installing tools
+................
+
+Install deb packages:
+
+ * gradle
+ * jdk
+ * make
+
+e.g. as root run
+
+    apt install make gradle default-jdk
+
+make directory for local tools:
+
+    mkdir tools
+    cd tools
+
+clone swagger2markup-cli tool:
+
+    git clone https://github.com/Swagger2Markup/swagger2markup-cli.git
+
+build swagger2markup-cli tool:
+
+    cd swagger2markup-cli
+    gradle assemble
+

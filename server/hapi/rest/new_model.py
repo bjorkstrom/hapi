@@ -3,6 +3,7 @@
 #
 
 import json
+import yaml
 import os
 from os import path
 
@@ -17,45 +18,38 @@ MODEL_FILE_DIR = "model_files"
 class InvalidModel(Exception):
     pass
 
+#
+# We use an external json schema file to validate
+# the new model json metadata.
+#
+# This is due to the fact that in swagger 2.0 it's not
+# possible to specify json format for one of the parts
+# in a multipart/form-data POST request.
+#
 
-#
-# We specify the schema for new model structure here,
-# because it seems it't not possible to specify schema for
-# bson POST request in swagger 2.0
-#
-MODEL_SCHEMA = {
-    "type": "object",
-    "properties":
-    {
-        "name": {"type": "string"},
-        "description": {"type": "string"},
-        "defaultPosition": {
-            "type": "object",
-            "properties": {
-                "sweref99": {
-                    "type": "object",
-                    "properties": {
-                        "projection": {
-                            "type": "string",
-                            "enum": [
-                                "TM", "12 00", "13 30", "15 00", "16 30",
-                                "18 00", "14 15", "15 45", "17 15", "18 45",
-                                "20 15", "21 45", "23 15",
-                            ],
-                        },
-                        "x": {"type": "number"},
-                        "y": {"type": "number"},
-                        "z": {"type": "number"},
-                        "roll": {"type": "number"},
-                        "pitch": {"type": "number"},
-                        "yaw": {"type": "number"},
-                    },
-                    "required": ["projection", "x", "y", "z"],
-                },
-            },
-        },
-    },
-}
+
+ModelSchema = None
+
+
+def _get_model_schema():
+    """
+    lazy-load and parse the ../swagger/model.yaml file
+    """
+    global ModelSchema
+
+    def _load_model_schema():
+        # figure out the ../swagger/model.yaml path
+        # using this source file's path
+        root_dir, _ = path.split(path.dirname(__file__))
+        sch_path = path.join(root_dir, "swagger", "model.yaml")
+
+        with open(sch_path, "r") as f:
+            return yaml.load(f)
+
+    if ModelSchema is None:
+        ModelSchema = _load_model_schema()
+
+    return ModelSchema
 
 
 def _parse_model_json(json_str):
@@ -69,7 +63,7 @@ def _parse_model_json(json_str):
 
 def _validate_model_dic(model_dict):
     try:
-        jsonschema.validate(model_dict, MODEL_SCHEMA)
+        jsonschema.validate(model_dict, _get_model_schema())
     except ValidationError as e:
         raise InvalidModel("invalid model description: %s" % str(e))
 

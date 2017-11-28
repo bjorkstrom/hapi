@@ -1,0 +1,47 @@
+---
+type: object
+properties:
+  name:
+    type: string
+  description:
+    type: string
+  defaultPosition:
+    type: object
+    properties:
+      sweref99:
+        type: object
+        required:
+        - projection
+        - x
+        - y
+        - z
+        properties:
+          projection:
+            type: string
+            enum:
+            - TM
+            - 12 00
+            - 13 30
+            - 15 00
+            - 16 30
+            - 18 00
+            - 14 15
+            - 15 45
+            - 17 15
+            - 18 45
+            - 20 15
+            - 21 45
+            - 23 15
+          x:
+            type: number
+          y:
+            type: number
+          roll:
+            type: number
+          yaw:
+            type: number
+          pitch:
+            type: number
+          z:
+            type: number
+

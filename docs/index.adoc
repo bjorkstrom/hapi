@@ -1,4 +1,102 @@
-include::intro.adoc[]
+== Hägring API
+
+Hägring devices are connected to the Hägring Cloud.
+Using the cloud allows the user to manage the models available on a Hägring device, configure the device as well as to monitor various states of the device.
+
+This document describes the API for the Hägring Cloud, thus allowing the user to manage and monitor Hägring devices programmatically.
+
+Hägring Cloud API is implemented in the RESTful style.
+That is the cloud is accessed by making various HTTP requests to predefined URLs.
+
+=== Models Management
+
+The Hägring cloud maintains a repository of available models.
+To make a model visible on the device a model instance is created.
+Same model can be instantiated multiple times on same device, for example at different positions.
+
+Making a model available on a Hägring device is a two step process.
+First the model must be uploaded to the cloud.
+When a model is successfully imported to the cloud it can be instantiated on a Hägring device.
+
+After a model is uploaded, it will be converted into a Hägring specific format.
+Depending on the complexity of the model, the processing can take a considerable time.
+Once the model have been successfully converted, it will be automatically uploaded to all Hägring devices where it is instantiated.
+
+==== Uploading models
+
+To add a new model to models repository, the model's source file must be uploaded with <<_models_new_post,upload new model>> request.
+Currently IFC, FBX and DAE files are supported.
+Together with the source file, model's metadata needs to be specified.
+Metadata are model's name, description and optionally default position information.
+
+The <<_models_new_post,upload new model>> request body is in `multipart/form-data` format.
+Where one part is the model's source file and the second part is the metadata in JSON format.
+
+==== Model's Coordinates
+
+In order to display a model, it's GNSS coordinates must be known.
+Hägring supports two model placement modes `global` and `movable`.
+`global` model can only be instantiated at the original position.
+A `movable` model can be instantiated at any desired position.
+
+The model's placement mode is specified when it is initially uploaded.
+When uploading `global` model, it's position must be known.
+That position must either be explicitly specified in the request's metadata, or for some IFC files can be implicitly determined from the model's source file.
+
+The Hägring cloud will use implicit position when following condition are satisfied:
+
+ * the source file is an IFC file in global SWEREF coordinates
+ * the SWEREF projection for the file is specified in the request
+ * model is uploaded in `global` mode
+
+When uploading a `movable` model, specifying it's position is optional.
+The position can be specified later while creating a model instance.
+
+For `movable` models, the position specified via Hägring API defines GNSS coordinates of the model's origo, as defined in the uploaded source file.
+In the same way, when specifying roll, yaw and pitch angles for the model, it will be rotated around the origo.
+When working with `movable` models, it is a good practice to make sure that origo is defined at a suitable location relative to the model.
+It should be defined "close" to the model, preferably in some well know point, for example a building's corner.
+Having a model's origo at good location make it easier to define GNSS coordinate and rotation angles.
+
+==== Query Model's Status
+
+The <<_models_modelid_get,get model status>> request provides a model's metadata as well as it's import status.
+
+The import status can be `processing`, `done` or `failed`. A `processing` status indicates the import is in progress, and the model is not yet available for Hägring devices.
+
+A `done` status mean the model have been successfully imported to repository and is ready to be display by Hägring devices.
+
+A `failed` status mean that import have failed, the model is not available for Hägring devices.
+An import can fail if the model's source file format could not be parsed. For example if the file format is incompatible or corrupt.
+
+
+==== Updating Models
+
+An already uploaded model's meta data can be modified with <<_models_modelid_put,update model>> request.
+It is possible to update model's name, description and for `movable` models the default position.
+Specified metadata field will overwrite values, unspecified field are not changed.
+
+==== Delete Models
+
+To delete a model from a repository use <<_models_modelid_delete,delete model>> request.
+It’s not possible to remove model if it’s currently instantiated on a Hägring device.
+
+==== Model Instances
+
+To make a model available on a Hägring device, a model instance must be created.
+A model instance contains the model ID and GNSS position where to place the model.
+Same model can be instantiated multiple times on a device.
+
+For `movable` models, the GNSS position can either be explicitly specified for the instance or if omitted, the model's default position will be used.
+
+For `global` models, it's not possible to specify GNSS position for the instance.
+Model's fixed position is always used.
+
+Each device have a list of currently active model instances.
+The <<_device_serialno_models_post,set model instances>> request is used to create model instances on a device.
+The request will overwrite the previous model instances list with a new one.
+Current list of model instances on a device can be acquired with <<_device_serialno_models_get,get model instances>> request.
+
 include::generated/paths.adoc[]
 include::generated/definitions.adoc[]
 

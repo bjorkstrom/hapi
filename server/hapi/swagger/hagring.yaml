@@ -73,7 +73,7 @@ paths:
           schema:
             $ref: "#/definitions/ErrorResponse"
     get:
-      summary: get model description and import status
+      summary: get model's metadata and import status
       produces:
         - application/json
       parameters:

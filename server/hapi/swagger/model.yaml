@@ -1,10 +1,17 @@
 ---
 type: object
+required:
+  - placement
 properties:
   name:
     type: string
   description:
     type: string
+  placement:
+    type: string
+    enum:
+      - global
+      - movable
   defaultPosition:
     type: object
     properties:
@@ -12,9 +19,6 @@ properties:
         type: object
         required:
         - projection
-        - x
-        - y
-        - z
         properties:
           projection:
             type: string
@@ -44,4 +48,3 @@ properties:
             type: number
           z:
             type: number
-

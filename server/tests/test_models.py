@@ -12,6 +12,7 @@ def get_new_model_json(name, description, position):
     md = {
         "name": name,
         "description": description,
+        "placement": "global",
         "defaultPosition": {"sweref99": position.sweref99},
     }
     return json.dumps(md)

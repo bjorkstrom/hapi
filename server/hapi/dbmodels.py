@@ -3,6 +3,7 @@ import enum
 from hapi.database import Base
 from sqlalchemy import Column, Integer, String, Numeric, Boolean
 from sqlalchemy import Enum, ForeignKey, orm
+from sqlalchemy.orm import backref
 
 _ImportStat = enum.Enum("ImportStatus",
                         "processing done failed")
@@ -99,7 +100,7 @@ class ModelInstance(Base):
         if mod is None:
             raise ModelNotFound(modId)
 
-        args = dict(
+        return ModelInstance(
             name=data.get(NAME),
             description=data.get(DESC),
             hidden=data.get(HIDDEN, False),
@@ -205,3 +206,80 @@ class SwerefPos(Base):
             roll=self.roll,
             pitch=self.pitch,
             yaw=self.yaw)
+
+
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True)
+    duration = Column(Integer)
+
+    _device = Column("device", String, ForeignKey("devices.serialNo"))
+    device = orm.relationship("Device")
+
+    _restEndpoint = Column("restEndpoint", String, ForeignKey("restEndpoints.id", ondelete="CASCADE"))
+    restEndpoint = orm.relationship("RestEndpoint")
+
+    
+    @staticmethod
+    def from_dict(device, data):
+        def _get_restEndpoint():
+            return RestEndpoint.from_dict(data["destination"]["restEndpoint"])
+
+        return Subscription(
+            duration=data["duration"],    
+            restEndpoint =_get_restEndpoint(),
+            device=device 
+            )
+
+        return Subscription(**args)  
+
+    @staticmethod
+    def get(subId):
+        return Subscription.query.filter(Subscription.id == subId).first()
+
+
+       
+class RestEndpoint(Base):
+    __tablename__ = "restEndpoints" 
+
+    id = Column(Integer, primary_key=True)
+    url = Column(String)
+    method = Column(String)
+    # httpheaders: a virtual column to being as a reference 
+    httpheaders = orm.relationship('HttpHeader', backref='owner', lazy='dynamic', passive_deletes=True)   
+    
+    @staticmethod
+    def from_dict(data):
+        def _get_headers():
+           headers = []
+
+           for header_dict in data["headers"]:
+               headers.append(HttpHeader.from_dict(header_dict))
+
+           return headers
+
+        return RestEndpoint(
+            url=data["URL"],
+            method=data["method"],
+            httpheaders = _get_headers()
+             )
+    @staticmethod
+    def get(restID):
+        return RestEndpoint.query.filter(RestEndpoint.id == restID).first()        
+
+class HttpHeader(Base):
+    __tablename__ = "httpHeaders" 
+
+    name = Column(String, primary_key=True)
+    value = Column(String)
+    _restEndpoints = Column("restEndpoint", String, ForeignKey("restEndpoints.id", ondelete="CASCADE"), primary_key=True )
+    restEndpoint = orm.relationship("RestEndpoint")
+
+    @staticmethod
+    def from_dict(data):
+        
+        return HttpHeader(
+            name=data["name"],
+            value=data["value"]
+             )

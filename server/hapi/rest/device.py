@@ -5,18 +5,13 @@ from hapi import database
 from . import util
 
 
-def _device_not_found_resp(serialNo):
-    msg = "no device with serial number '%s' exists" % serialNo
-    return dict(message=msg), 404
-
-
 #
 # POST /device/{serialNo}/models
 #
 def post(serialNo, modelInstances):
     device = Device.get(serialNo)
     if device is None:
-        return _device_not_found_resp(serialNo)
+        return util.device_not_found_resp(serialNo)
 
     session = database.db_session
 
@@ -42,7 +37,7 @@ def post(serialNo, modelInstances):
 def get(serialNo):
     device = Device.get(serialNo)
     if device is None:
-        return _device_not_found_resp(serialNo)
+        return util.device_not_found_resp(serialNo)
 
     instances = []
     for mod_inst in device.model_instances:

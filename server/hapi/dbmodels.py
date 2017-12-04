@@ -1,4 +1,5 @@
 import enum
+import time
 
 from hapi.database import Base
 from sqlalchemy import Column, Integer, String, Numeric, Boolean
@@ -23,7 +24,6 @@ DEF_POS = "defaultPosition"
 class ModelNotFound(Exception):
     def __init__(self, modelId):
         self.modelId = modelId
-
 
 class Device(Base):
     __tablename__ = "devices"
@@ -212,22 +212,20 @@ class Subscription(Base):
     __tablename__ = "subscriptions"
 
     id = Column(Integer, primary_key=True)
-    duration = Column(Integer)
-
+    expiration = Column(Integer)
     _device = Column("device", String, ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
     _restEndpoint = Column("restEndpoint", String, ForeignKey("restEndpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
-
-    
+ 
     @staticmethod
     def from_dict(device, data):
         def _get_restEndpoint():
             return RestEndpoint.from_dict(data["destination"]["restEndpoint"])
-
+        
         return Subscription(
-            duration=data["duration"],    
+            expiration = Subscription.get_Expiration(data["duration"]),    
             restEndpoint =_get_restEndpoint(),
             device=device 
             )
@@ -238,8 +236,13 @@ class Subscription(Base):
     def get(subId):
         return Subscription.query.filter(Subscription.id == subId).first()
 
+  
+    @staticmethod
+    def get_Expiration(duration):
+        epoch_time = time.time()
+        return  duration + int(epoch_time)
 
-       
+
 class RestEndpoint(Base):
     __tablename__ = "restEndpoints" 
 

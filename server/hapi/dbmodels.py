@@ -218,15 +218,28 @@ class Subscription(Base):
                            String,
                            ForeignKey("restEndpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
+    topics = orm.relationship('EventTopics',
+                              backref='owner',
+                              lazy='dynamic',
+                              passive_deletes=True)
 
     @staticmethod
     def from_dict(device, data):
         def _get_restEndpoint():
             return RestEndpoint.from_dict(data["destination"]["restEndpoint"])
+
+        def _get_topics():
+            topics = []
+            for topic_dict in data["eventFilters"]:
+                topics.append(EventTopics.from_dict(topic_dict))
+
+            return topics
+
         return Subscription(
             expiration=Subscription.get_Expiration(data["duration"]),
             restEndpoint=_get_restEndpoint(),
-            device=device
+            device=device,
+            topics=_get_topics()
         )
 
     @staticmethod
@@ -289,3 +302,21 @@ class HttpHeader(Base):
             name=data["name"],
             value=data["value"]
              )
+
+
+class EventTopics(Base):
+    __tablename__ = "topicEvents"
+
+    topic = Column(String, primary_key=True)
+    _subscription = Column("subscription",
+                           String,
+                           ForeignKey("subscriptions.id",
+                                      ondelete="CASCADE"),
+                           primary_key=True)
+    subscription = orm.relationship("Subscription")
+
+    @staticmethod
+    def from_dict(data):
+        return EventTopics(
+            topic=data["topic"]
+            )

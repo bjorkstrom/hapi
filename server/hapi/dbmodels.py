@@ -4,7 +4,6 @@ import time
 from hapi.database import Base
 from sqlalchemy import Column, Integer, String, Numeric, Boolean
 from sqlalchemy import Enum, ForeignKey, orm
-from sqlalchemy.orm import backref
 
 _ImportStat = enum.Enum("ImportStatus",
                         "processing done failed")
@@ -24,6 +23,7 @@ DEF_POS = "defaultPosition"
 class ModelNotFound(Exception):
     def __init__(self, modelId):
         self.modelId = modelId
+
 
 class Device(Base):
     __tablename__ = "devices"
@@ -108,8 +108,6 @@ class ModelInstance(Base):
             device=device,
             position=_get_position(),
         )
-
-        return ModelInstance(**args)
 
 
 class Model(Base):
@@ -216,72 +214,77 @@ class Subscription(Base):
     _device = Column("device", String, ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
-    _restEndpoint = Column("restEndpoint", String, ForeignKey("restEndpoints.id", ondelete="CASCADE"))
+    _restEndpoint = Column("restEndpoint",
+                           String,
+                           ForeignKey("restEndpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
- 
+
     @staticmethod
     def from_dict(device, data):
         def _get_restEndpoint():
             return RestEndpoint.from_dict(data["destination"]["restEndpoint"])
-        
         return Subscription(
-            expiration = Subscription.get_Expiration(data["duration"]),    
-            restEndpoint =_get_restEndpoint(),
-            device=device 
-            )
-
-        return Subscription(**args)  
+            expiration=Subscription.get_Expiration(data["duration"]),
+            restEndpoint=_get_restEndpoint(),
+            device=device
+        )
 
     @staticmethod
     def get(subId):
         return Subscription.query.filter(Subscription.id == subId).first()
 
-  
     @staticmethod
     def get_Expiration(duration):
         epoch_time = time.time()
-        return  duration + int(epoch_time)
+        return duration + int(epoch_time)
 
 
 class RestEndpoint(Base):
-    __tablename__ = "restEndpoints" 
+    __tablename__ = "restEndpoints"
 
     id = Column(Integer, primary_key=True)
     url = Column(String)
     method = Column(String)
-    # httpheaders: a virtual column to being as a reference 
-    httpheaders = orm.relationship('HttpHeader', backref='owner', lazy='dynamic', passive_deletes=True)   
-    
+    # httpheaders: a virtual column to being as a reference
+    httpheaders = orm.relationship('HttpHeader',
+                                   backref='owner',
+                                   lazy='dynamic',
+                                   passive_deletes=True)
+
     @staticmethod
     def from_dict(data):
         def _get_headers():
-           headers = []
+            headers = []
+            for header_dict in data["headers"]:
+                headers.append(HttpHeader.from_dict(header_dict))
 
-           for header_dict in data["headers"]:
-               headers.append(HttpHeader.from_dict(header_dict))
-
-           return headers
+            return headers
 
         return RestEndpoint(
             url=data["URL"],
             method=data["method"],
-            httpheaders = _get_headers()
+            httpheaders=_get_headers()
              )
+
     @staticmethod
     def get(restID):
-        return RestEndpoint.query.filter(RestEndpoint.id == restID).first()        
+        return RestEndpoint.query.filter(RestEndpoint.id == restID).first()
+
 
 class HttpHeader(Base):
-    __tablename__ = "httpHeaders" 
+    __tablename__ = "httpHeaders"
 
     name = Column(String, primary_key=True)
     value = Column(String)
-    _restEndpoints = Column("restEndpoint", String, ForeignKey("restEndpoints.id", ondelete="CASCADE"), primary_key=True )
+    _restEndpoints = Column("restEndpoint",
+                            String,
+                            ForeignKey("restEndpoints.id",
+                                       ondelete="CASCADE"),
+                            primary_key=True)
     restEndpoint = orm.relationship("RestEndpoint")
 
     @staticmethod
     def from_dict(data):
-        
         return HttpHeader(
             name=data["name"],
             value=data["value"]

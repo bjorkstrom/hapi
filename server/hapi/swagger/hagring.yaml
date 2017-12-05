@@ -270,6 +270,9 @@ definitions:
         type: array
         items:
           type: object
+          required:
+            - name
+            - value
           properties:
             name:
               type: string

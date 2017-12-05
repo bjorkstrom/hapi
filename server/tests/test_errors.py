@@ -6,7 +6,6 @@ from bravado.exception import HTTPBadRequest, HTTPNotFound
 
 
 class TestNotFoundResp(unittest.TestCase, utils.ErrorReqMixin):
-
     def test_get_nonexistent_model(self):
 
         with self.assertRaises(HTTPNotFound) as cm:

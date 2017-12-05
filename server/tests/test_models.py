@@ -74,11 +74,11 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
                           model=self.modelId),
         ])
         Client.device.post_device_serialNo_models(
-            serialNo=TEST_DEVICE, modelInstances=mod_insts).result()
+            serialNo=utils.TEST_DEVICE, modelInstances=mod_insts).result()
 
     def delete_instances(self):
         Client.device.post_device_serialNo_models(
-            serialNo=TEST_DEVICE,
+            serialNo=utils.TEST_DEVICE,
             modelInstances=ModelInstances(modelInstances=[])
         ).result()
 
@@ -95,7 +95,7 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
         test getting current model instances
         """
         res = Client.device.get_device_serialNo_models(
-            serialNo=TEST_DEVICE
+            serialNo=utils.TEST_DEVICE
         ).result()
         instances = [
             ModelInstance(
@@ -116,11 +116,11 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
             ModelInstance(name="new_inst",
                           model=self.modelId)])
         Client.device.post_device_serialNo_models(
-            serialNo=TEST_DEVICE, modelInstances=mod_insts).result()
+            serialNo=utils.TEST_DEVICE, modelInstances=mod_insts).result()
 
         # get model instances, and check that they have been updated
         res = Client.device.get_device_serialNo_models(
-            serialNo=TEST_DEVICE
+            serialNo=utils.TEST_DEVICE
         ).result()
         self.assertEqual(res, ModelInstances(modelInstances=[ModelInstance(
                 name="new_inst",
@@ -137,7 +137,7 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
 
         # check that model instances list is empty
         res = Client.device.get_device_serialNo_models(
-            serialNo=TEST_DEVICE
+            serialNo=utils.TEST_DEVICE
         ).result()
         self.assertEqual(res, ModelInstances(modelInstances=[]))
 

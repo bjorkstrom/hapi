@@ -134,8 +134,8 @@ class TestInstances(unittest.TestCase, ModelMakerMixin):
         self.create_instances()
 
     def tearDown(self):
-        self.delete_model()
         self.delete_instances()
+        self.delete_model()
 
     def test_get(self):
         """

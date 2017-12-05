@@ -68,3 +68,42 @@ class TestBadRequests(unittest.TestCase, utils.ErrorReqMixin):
                      model=json.dumps(dict(name=3))).result()
 
         self._assert_error_msg_contains(cm.exception, "Failed validating")
+
+
+class TestDelUsedModel(utils.ModelMakerMixin,
+                       utils.ErrorReqMixin,
+                       unittest.TestCase):
+    """
+    test deleting a model that is instantiated on a device
+    """
+    def create_instance(self):
+        mod_insts = ModelInstances(modelInstances=[
+            ModelInstance(name="inst0",
+                          model=self.modelId),
+        ])
+        Client.device.post_device_serialNo_models(
+            serialNo=utils.TEST_DEVICE, modelInstances=mod_insts).result()
+
+    def delete_instance(self):
+        Client.device.post_device_serialNo_models(
+            serialNo=utils.TEST_DEVICE,
+            modelInstances=ModelInstances(modelInstances=[])
+        ).result()
+
+    def setUp(self):
+        self.create_model()
+        self.create_instance()
+
+    def tearDown(self):
+        self.delete_instance()
+        self.delete_model()
+
+    def test_del_used(self):
+        """
+        check that we get an 'bad request' when trying to delete a model
+        which is instantiated on a device
+        """
+        with self.assertRaises(HTTPBadRequest) as cm:
+            self.delete_model().result()
+
+        self._assert_error_msg_contains(cm.exception, "model instantiated on")

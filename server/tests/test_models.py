@@ -1,56 +1,9 @@
 import unittest
-import json
-from utils import Client, ModelStatus, Position, ModelInstances, ModelInstance
-
-# we assume that this device exists on the host
-# e.g. this device must be present to run the
-# tests in this file
-TEST_DEVICE = "A0"
+import utils
+from utils import Client, ModelStatus, ModelInstances, ModelInstance
 
 
-def get_new_model_json(name, description, position):
-    md = {
-        "name": name,
-        "description": description,
-        "placement": "global",
-        "defaultPosition": {"sweref99": position.sweref99},
-    }
-    return json.dumps(md)
-
-
-class ModelMakerMixin:
-    MOD_NAME = "test model"
-    MOD_DESK = "model description"
-    DEF_POS = Position(
-        sweref99={
-            "projection": "18 00",
-            "x": 6175471.9873,
-            "y": 300000.1234,
-            "z": 68.0223,
-            "yaw": 0.0,
-            "roll": 0.0,
-            "pitch": 0.0,
-        }
-    )
-
-    def create_model(self):
-        model_str = get_new_model_json(
-            self.MOD_NAME, self.MOD_DESK, self.DEF_POS)
-        res = Client.models.post_models_new(modelFile="dummy_data",
-                                            model=model_str).result()
-        self.modelId = res["model"]
-
-    def delete_model(self):
-        #
-        # Delete created model
-        #
-        res = Client.models.delete_models_modelId(
-            modelId=self.modelId
-        ).result()
-        self.assertIsNone(res)
-
-
-class TestModel(unittest.TestCase, ModelMakerMixin):
+class TestModel(unittest.TestCase, utils.ModelMakerMixin):
     """
     Test creating, updating, getting and deleting model.
     """
@@ -109,7 +62,7 @@ class TestModel(unittest.TestCase, ModelMakerMixin):
                                      importStatus="processing"))
 
 
-class TestInstances(unittest.TestCase, ModelMakerMixin):
+class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
     """
     Test model instances API requests
     """

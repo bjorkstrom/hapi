@@ -102,6 +102,10 @@ paths:
       responses:
         204:
           description: model deleted
+        400:
+          description: model is instanciated, can't delete
+          schema:
+            $ref: "#/definitions/ErrorResponse"
         404:
           description: model not found
           schema:

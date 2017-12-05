@@ -9,5 +9,6 @@ setuptools.setup(
         "connexion==1.1.16",
         "SQLAlchemy==1.1.15",
         "jsonschema==2.6.0",
+        "pika==0.11.2",
     },
 )

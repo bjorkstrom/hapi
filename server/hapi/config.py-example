@@ -1,0 +1,4 @@
+DB_USERNAME = "dbuser"
+DB_PASSWORD = "****"
+DB_HOST = "example.com"
+DB_NAME = "dataname"

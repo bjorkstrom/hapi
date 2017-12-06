@@ -28,8 +28,9 @@ class ModelNotFound(Exception):
 class Device(Base):
     __tablename__ = "devices"
 
-    serialNo = Column(String, primary_key=True)
+    SERIAL_NO_LEN = 16
 
+    serialNo = Column(String(SERIAL_NO_LEN), primary_key=True)
     model_instances = orm.relationship("ModelInstance")
 
     def as_dict(self):
@@ -56,8 +57,8 @@ class ModelInstance(Base):
     __tablename__ = "model_instances"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(String)
+    name = Column(String(128))
+    description = Column(String(256))
     hidden = Column(Boolean)
 
     _model_id = Column("model", Integer, ForeignKey("models.id"))
@@ -66,7 +67,9 @@ class ModelInstance(Base):
     _position_id = Column("position", Integer, ForeignKey("swerefPos.id"))
     position = orm.relationship("SwerefPos")
 
-    _device = Column("device", String, ForeignKey("devices.serialNo"))
+    _device = Column("device",
+                     String(Device.SERIAL_NO_LEN),
+                     ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
     def as_dict(self):
@@ -114,8 +117,8 @@ class Model(Base):
     __tablename__ = "models"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    description = Column(String)
+    name = Column(String(128))
+    description = Column(String(256))
     import_status = Column(Enum(_ImportStat))
 
     default_position_id = Column(Integer, ForeignKey("swerefPos.id"))
@@ -165,14 +168,18 @@ class Model(Base):
 class SwerefPos(Base):
     __tablename__ = "swerefPos"
 
+    # 15 max total digit include decimals
+    # 5 max digits after the decimal point
+    POS_PRECISION = "15,5"
+
     id = Column(Integer, primary_key=True)
-    projection = Column(String)
-    x = Column(Numeric)
-    y = Column(Numeric)
-    z = Column(Numeric)
-    roll = Column(Numeric)
-    pitch = Column(Numeric)
-    yaw = Column(Numeric)
+    projection = Column(String(8))
+    x = Column(Numeric(precision=POS_PRECISION))
+    y = Column(Numeric(precision=POS_PRECISION))
+    z = Column(Numeric(precision=POS_PRECISION))
+    roll = Column(Numeric(precision=POS_PRECISION))
+    pitch = Column(Numeric(precision=POS_PRECISION))
+    yaw = Column(Numeric(precision=POS_PRECISION))
 
     def copy(self):
         return SwerefPos(
@@ -211,11 +218,14 @@ class Subscription(Base):
 
     id = Column(Integer, primary_key=True)
     expiration = Column(Integer)
-    _device = Column("device", String, ForeignKey("devices.serialNo"))
+
+    _device = Column("device",
+                     String(Device.SERIAL_NO_LEN),
+                     ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
     _restEndpoint = Column("restEndpoint",
-                           String,
+                           Integer,
                            ForeignKey("restEndpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
     topics = orm.relationship('EventTopics',
@@ -256,8 +266,8 @@ class RestEndpoint(Base):
     __tablename__ = "restEndpoints"
 
     id = Column(Integer, primary_key=True)
-    url = Column(String)
-    method = Column(String)
+    url = Column(String(256))
+    method = Column(String(16))
     # httpheaders: a virtual column to being as a reference
     httpheaders = orm.relationship('HttpHeader',
                                    backref='owner',
@@ -285,10 +295,10 @@ class RestEndpoint(Base):
 class HttpHeader(Base):
     __tablename__ = "httpHeaders"
 
-    name = Column(String, primary_key=True)
-    value = Column(String)
+    name = Column(String(64), primary_key=True)
+    value = Column(String(256))
     _restEndpoints = Column("restEndpoint",
-                            String,
+                            Integer,
                             ForeignKey("restEndpoints.id",
                                        ondelete="CASCADE"),
                             primary_key=True)
@@ -303,9 +313,9 @@ class HttpHeader(Base):
 class EventTopics(Base):
     __tablename__ = "topicEvents"
 
-    topic = Column(String, primary_key=True)
+    topic = Column(String(64), primary_key=True)
     _subscription = Column("subscription",
-                           String,
+                           Integer,
                            ForeignKey("subscriptions.id",
                                       ondelete="CASCADE"),
                            primary_key=True)

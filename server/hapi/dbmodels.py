@@ -61,15 +61,13 @@ class ModelInstance(Base):
     description = Column(String(256))
     hidden = Column(Boolean)
 
-    _model_id = Column("model", Integer, ForeignKey("models.id"))
+    _model_id = Column("model", ForeignKey("models.id"))
     model = orm.relationship("Model")
 
-    _position_id = Column("position", Integer, ForeignKey("swerefPos.id"))
+    _position_id = Column("position", ForeignKey("swerefPos.id"))
     position = orm.relationship("SwerefPos")
 
-    _device = Column("device",
-                     String(Device.SERIAL_NO_LEN),
-                     ForeignKey("devices.serialNo"))
+    _device = Column("device", ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
     def as_dict(self):
@@ -121,7 +119,7 @@ class Model(Base):
     description = Column(String(256))
     import_status = Column(Enum(_ImportStat))
 
-    default_position_id = Column(Integer, ForeignKey("swerefPos.id"))
+    default_position_id = Column(ForeignKey("swerefPos.id"))
     default_position = orm.relationship("SwerefPos")
 
     def as_dict(self):
@@ -219,13 +217,10 @@ class Subscription(Base):
     id = Column(Integer, primary_key=True)
     expiration = Column(Integer)
 
-    _device = Column("device",
-                     String(Device.SERIAL_NO_LEN),
-                     ForeignKey("devices.serialNo"))
+    _device = Column("device", ForeignKey("devices.serialNo"))
     device = orm.relationship("Device")
 
     _restEndpoint = Column("restEndpoint",
-                           Integer,
                            ForeignKey("restEndpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
     topics = orm.relationship('EventTopics',
@@ -298,7 +293,6 @@ class HttpHeader(Base):
     name = Column(String(64), primary_key=True)
     value = Column(String(256))
     _restEndpoints = Column("restEndpoint",
-                            Integer,
                             ForeignKey("restEndpoints.id",
                                        ondelete="CASCADE"),
                             primary_key=True)
@@ -315,7 +309,6 @@ class EventTopics(Base):
 
     topic = Column(String(64), primary_key=True)
     _subscription = Column("subscription",
-                           Integer,
                            ForeignKey("subscriptions.id",
                                       ondelete="CASCADE"),
                            primary_key=True)

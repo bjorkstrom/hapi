@@ -17,7 +17,7 @@ def post(serialNo, modelInstances):
 
     # delete old model instances
     for mod_inst in device.model_instances:
-        session.delete(mod_inst)
+        mod_inst.delete(session)
 
     try:
         for mod_inst in modelInstances["modelInstances"]:

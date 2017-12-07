@@ -82,6 +82,15 @@ class ModelInstance(Base):
 
         return d
 
+    def delete(self, session):
+        """
+        delete this model instance and it's position, if any,
+        in the specified session
+        """
+        if self.position is not None:
+            session.delete(self.position)
+        session.delete(self)
+
     @staticmethod
     def from_dict(device, data):
         def _get_position():
@@ -140,6 +149,16 @@ class Model(Base):
 
         if DESC in new_vals:
             self.description = new_vals[DESC]
+
+    def delete(self, session):
+        """
+        delete this model and it's default position, if any,
+        in the specified session
+        """
+        if self.default_position is not None:
+            # delete default position, if it was specified
+            session.delete(self.default_position)
+        session.delete(self)
 
     @staticmethod
     def from_dict(data):

@@ -68,10 +68,11 @@ def delete(modelId):
     if mod is None:
         return util.model_not_found_resp(modelId)
 
-    database.db_session.delete(mod)
+    session = database.db_session
+    mod.delete(session)
 
     try:
-        database.db_session.commit()
+        session.commit()
     except exc.IntegrityError as e:
         # we kind of assume, or rather, hope
         # that the integrity error is triggered by the

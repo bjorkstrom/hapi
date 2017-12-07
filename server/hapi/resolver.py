@@ -21,7 +21,7 @@ OPS_MAP = {
     ("get", "/device/{serialNo}/models"):
         "device.get",
     ("post", "/models/new", ):
-        "models.post",
+        "models.new",
     ("put", "/models/{modelId}"):
         "models.put",
     ("get", "/models"):

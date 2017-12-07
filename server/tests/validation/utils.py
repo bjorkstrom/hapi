@@ -2,12 +2,6 @@ import json
 from bravado.client import SwaggerClient
 
 
-# we assume that this device exists on the host
-# e.g. this device must be present to run the
-# tests in this file
-TEST_DEVICE = "A0"
-
-
 Client = SwaggerClient.from_url("http://localhost:9090/v1/swagger.json")
 
 

@@ -18,7 +18,7 @@ def _model_instantiated_resp():
 #
 # POST /models/new
 #
-def post(modelFile, model):
+def new(modelFile, model):
     try:
         modID = new_model.add_model(modelFile, model)
     except new_model.InvalidModel as e:

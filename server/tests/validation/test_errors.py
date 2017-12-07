@@ -1,7 +1,8 @@
 import unittest
 import json
-import utils
-from utils import Client, ModelInstances, ModelInstance
+from .. import settings
+from . import utils
+from .utils import Client, ModelInstances, ModelInstance
 from bravado.exception import HTTPBadRequest, HTTPNotFound
 
 
@@ -81,11 +82,11 @@ class TestDelUsedModel(utils.ModelMakerMixin,
                           model=self.modelId),
         ])
         Client.device.post_device_serialNo_models(
-            serialNo=utils.TEST_DEVICE, modelInstances=mod_insts).result()
+            serialNo=settings.TEST_DEVICE, modelInstances=mod_insts).result()
 
     def delete_instance(self):
         Client.device.post_device_serialNo_models(
-            serialNo=utils.TEST_DEVICE,
+            serialNo=settings.TEST_DEVICE,
             modelInstances=ModelInstances(modelInstances=[])
         ).result()
 

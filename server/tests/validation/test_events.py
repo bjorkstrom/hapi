@@ -1,5 +1,5 @@
 import unittest
-from utils import Client, EventSubscription, EventFilter, RestEndpoint
+from .utils import Client, EventSubscription, EventFilter, RestEndpoint
 
 
 class SubscriptionMakerMixin:

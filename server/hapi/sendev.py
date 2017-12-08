@@ -3,6 +3,7 @@
 import json
 import pika
 import sys
+import time
 
 EVENTS_QUEUE = "events"
 
@@ -15,6 +16,11 @@ EVENTS = dict(
     inst_modified="ModelInstance/Modified",
     inst_removed="ModelInstance/Removed",
 )
+
+
+def timestamp():
+    epoch_time = time.time()
+    return epoch_time
 
 
 def generate_payload(event_name):
@@ -38,6 +44,7 @@ def generate_payload(event_name):
 
 def generate_event_json(device, event_name):
     ed = dict(device=device,
+              timestamp=timestamp(),
               topic=EVENTS[event_name])
 
     payload = generate_payload(event_name)
@@ -45,6 +52,7 @@ def generate_event_json(device, event_name):
         ed["payload"] = payload
 
     return json.dumps(ed)
+
 
 def bail_out(msg):
     print(msg)

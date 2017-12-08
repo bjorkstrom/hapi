@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-
 import pika
 import json
+import time
+from hapi.dbmodels import Device
+import requests
 
 EVENTS_QUEUE = "events"
 
@@ -11,8 +13,39 @@ def do_maintenance():
     pass
 
 
-def dispatch_event(device, topic, payload):
-    print("send event: device %s, topic %s" % (device, topic))
+def epoch2iso(epoch):
+    """
+    convert unix epoch timestamp to ISO 8601 UTC date-time string
+    """
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(epoch))
+
+
+def send_event(device, topic, restEndpoint, timestamp):
+    """
+    send the event to subscription's destination
+    """
+    payload = {
+        "topic": topic,
+        "device": device,
+        "timestamp": epoch2iso(timestamp)
+    }
+
+    headers = {}
+    for header in restEndpoint.httpheaders:
+        headers[header.name] = header.value
+
+    r = requests.post(restEndpoint.url, json=payload, headers=headers)
+    print(r)
+
+
+def dispatch_event(device, topic, payload, timestamp):
+    dev = Device.get(device)
+    subs = dev.subscriptions
+    for sub in subs:
+        for subTopic in sub.topics:
+            if subTopic.topic == topic:
+                print("send event: device %s, topic %s" % (device, topic))
+                send_event(device, topic, sub.restEndpoint, timestamp)
 
 
 def init_channel():
@@ -26,7 +59,7 @@ def init_channel():
 
 def parse_body(body):
     ed = json.loads(body.decode("utf-8"))
-    return (ed["device"], ed["topic"], None)
+    return ed["device"], ed["topic"], None, ed["timestamp"]
 
 
 def main():

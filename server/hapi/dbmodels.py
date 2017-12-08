@@ -1,6 +1,5 @@
 import enum
 import time
-
 from hapi.database import Base
 from sqlalchemy import Column, Integer, String, Numeric, Boolean
 from sqlalchemy import Enum, ForeignKey, orm
@@ -32,6 +31,10 @@ class Device(Base):
 
     serialNo = Column(String(SERIAL_NO_LEN), primary_key=True)
     model_instances = orm.relationship("ModelInstance")
+
+    subscriptions = orm.relationship('Subscription',
+                                     backref='sub',
+                                     lazy='dynamic')
 
     def as_dict(self):
         return dict(serialNo=self.serialNo)

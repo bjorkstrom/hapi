@@ -10,8 +10,41 @@ EVENTS = dict(
     online="Device/Online",
     heartbeat="Device/Heartbeat",
     offline="Device/Offline",
+    error="Device/Error",
+    inst_created="ModelInstance/Created",
+    inst_modified="ModelInstance/Modified",
+    inst_removed="ModelInstance/Removed",
 )
 
+
+def generate_payload(event_name):
+    if event_name in ["online", "heartbeat", "offline"]:
+        return None
+
+    if event_name == "error":
+        return dict(errorCode=123,
+                    errorMessage="flux capacitor malfunction")
+
+    if event_name == "inst_created":
+        return dict(modelID="234", modelInstanceID="53",
+                    hidden=False)
+
+    if event_name == "inst_modified":
+        return dict(modelInstanceID="53", hidden=True)
+
+    if event_name == "inst_removed":
+        return dict(modelInstanceID="72")
+
+
+def generate_event_json(device, event_name):
+    ed = dict(device=device,
+              topic=EVENTS[event_name])
+
+    payload = generate_payload(event_name)
+    if payload is not None:
+        ed["payload"] = payload
+
+    return json.dumps(ed)
 
 def bail_out(msg):
     print(msg)
@@ -26,8 +59,7 @@ def usage():
 
 
 def send_event(device, event_name):
-    ed = dict(device=device,
-              topic=EVENTS[event_name])
+    body = generate_event_json(device, event_name)
 
     connection = pika.BlockingConnection(
         pika.ConnectionParameters("localhost"))
@@ -35,7 +67,7 @@ def send_event(device, event_name):
     channel.queue_declare(queue=EVENTS_QUEUE)
     channel.basic_publish(exchange='',
                           routing_key=EVENTS_QUEUE,
-                          body=json.dumps(ed))
+                          body=body)
 
     connection.close()
 

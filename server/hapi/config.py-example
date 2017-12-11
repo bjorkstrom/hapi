@@ -1,4 +1,22 @@
+#
+# Setting here are basically duplicated from
+#
+# /etc/bjorkstrom/Config.php
+#
+# but here they are in 'python' format, instead of PHP
+#
+# TODO we should create a single /etc/bjorkstrom/Config.json
+# and make both the PHP and python code use that
+#
+
+BRAB_ENV = "unity-builder-env"
+IMPORTER_VERSION = "origin/master"
+
 DB_USERNAME = "dbuser"
 DB_PASSWORD = "****"
 DB_HOST = "example.com"
 DB_NAME = "dataname"
+
+AWS_REGION = "eu-central-1"
+AWS_ASSET_BUCKET = "models-bucket"
+AWS_SQS_URL = "https://sqs.eu-central-1.amazonaws.com/462813428448/brab-jenkins-assets"

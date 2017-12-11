@@ -4,13 +4,13 @@
 
 import json
 import yaml
-import os
 from os import path
-
+import boto3
 import jsonschema
 from hapi.dbmodels import Model
 from hapi import database
 from jsonschema.exceptions import ValidationError
+from hapi import config
 
 MODEL_FILE_DIR = "model_files"
 
@@ -68,15 +68,43 @@ def _validate_model_dic(model_dict):
         raise InvalidModel("invalid model description: %s" % str(e))
 
 
-def _save_file(modelFile, modelId):
-    os.makedirs(MODEL_FILE_DIR, exist_ok=True)
-
-    fpath = path.join(MODEL_FILE_DIR, "mod%s" % modelId)
-    with open(fpath, "wb") as f:
-        f.write(modelFile.read())
+def _s3_key(model_id, user_id, mod_file_ext):
+    return "assets/%s/%s/source.%s" % (user_id, model_id, mod_file_ext)
 
 
-def add_model(modelFile, model):
+def _sqs_msg(model_id, user_id, mod_file_ext):
+    msg = dict(
+        owner=user_id,
+        model=model_id,
+        type=mod_file_ext,
+        env=config.BRAB_ENV,
+        importer_version=config.IMPORTER_VERSION)
+
+    return json.dumps(msg)
+
+
+def _publish_file(model_file, model_id, user_id):
+
+    _, ext = path.splitext(model_file.filename)
+    if ext.startswith("."):
+        ext = ext[1:]
+
+    s3_client = boto3.client("s3")
+    s3_client.upload_fileobj(model_file,
+                             config.AWS_ASSET_BUCKET,
+                             _s3_key(model_id, user_id, ext))
+
+    sqs_client = boto3.client(
+        "sqs",
+        region_name=config.AWS_REGION)
+
+    sqs_client.send_message(
+        QueueUrl=config.AWS_SQS_URL,
+        MessageBody=_sqs_msg(model_id, user_id, ext)
+    )
+
+
+def add_model(model_file, model, user_id):
     mod_dict = _parse_model_json(model)
     _validate_model_dic(mod_dict)
 
@@ -85,6 +113,6 @@ def add_model(modelFile, model):
     database.db_session.add(mod)
     database.db_session.commit()
 
-    _save_file(modelFile, mod.id)
+    _publish_file(model_file, mod.id, user_id)
 
     return mod.id

@@ -5,7 +5,7 @@ from . import config
 
 
 def db_url():
-    return "mysql+pymysql://%s:%s@%s/%s" % \
+    return "mysql+pymysql://%s:%s@%s/%s?charset=utf8" % \
            (config.DB_USERNAME, config.DB_PASSWORD,
             config.DB_HOST, config.DB_NAME)
 

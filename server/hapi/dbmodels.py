@@ -1,11 +1,9 @@
 import enum
 import time
 from hapi.database import Base
-from sqlalchemy import Column, Integer, String, Numeric, Boolean
+from sqlalchemy import Column, Integer, String, Text, Numeric, Boolean
 from sqlalchemy import Enum, ForeignKey, orm
 
-_ImportStat = enum.Enum("ImportStatus",
-                        "processing done failed")
 
 #
 # common dictionary key names used for serialization
@@ -123,18 +121,60 @@ class ModelInstance(Base):
         )
 
 
+_AssetGenStatus = enum.Enum("AssetGenStatus",
+                            "none started completed failed")
+
+
+_ImportStat = enum.Enum("ImportStatus",
+                        "processing done failed")
+
+
 class Model(Base):
     __tablename__ = "models"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(128))
     description = Column(String(256))
-    import_status = Column(Enum(_ImportStat))
 
     default_position_id = Column(ForeignKey("swerefPos.id"))
     default_position = orm.relationship("SwerefPos")
 
     instances = orm.relationship("ModelInstance")
+    #
+    # use the 'assetGenStatus' with the specified enums
+    # to be backward compatible with current unity-builder
+    # and PHP webapp
+    #
+    # use the import_status property to hide this backward
+    # compatibilty hack from the rest of the code
+    #
+    # TODO: change unity-builder and PHP webapp to use
+    #
+    # 'import_status' column with enums 'processing' 'done' 'failed'
+    # so that we can drop this backward hack
+    #
+    assetGenStatus = Column(Enum(_AssetGenStatus))
+
+    @property
+    def import_status(self):
+        ass2imp = {
+            _AssetGenStatus.none: _ImportStat.processing,
+            _AssetGenStatus.started: _ImportStat.processing,
+            _AssetGenStatus.completed: _ImportStat.done,
+            _AssetGenStatus.failed: _ImportStat.failed,
+        }
+
+        return ass2imp[self.assetGenStatus]
+
+    @import_status.setter
+    def import_status(self, value):
+        imp2ass = {
+            _ImportStat.processing: _AssetGenStatus.started,
+            _ImportStat.done: _AssetGenStatus.completed,
+            _ImportStat.failed: _AssetGenStatus.failed
+        }
+
+        self.assetGenStatus = imp2ass[value]
 
     def as_dict(self):
         d = dict(importStatus=self.import_status.name)
@@ -345,3 +385,18 @@ class EventTopics(Base):
     @staticmethod
     def from_dict(data):
         return EventTopics(topic=data["topic"])
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    password = Column(Text)
+    note = Column(Text)
+    wsTokenValue = Column(Integer, server_default="0", nullable=False)
+    wsTokenExpiration = Column(Integer, server_default="0", nullable=False)
+
+    @staticmethod
+    def get(username):
+        return User.query.filter(User.name == username).first()

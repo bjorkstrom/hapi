@@ -1,5 +1,6 @@
 import flask
-from hapi.dbmodels import Model
+from flask import request
+from hapi.dbmodels import Model, User
 from hapi import database
 
 from . import new_model, util
@@ -20,8 +21,11 @@ def _model_instantiated_resp():
 # POST /models/new
 #
 def new(modelFile, model):
+    # figure out current user ID
+    usr_id = User.get(request.authorization.username).id
+
     try:
-        modID = new_model.add_model(modelFile, model)
+        modID = new_model.add_model(modelFile, model, usr_id)
     except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
 

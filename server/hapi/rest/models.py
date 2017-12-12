@@ -1,5 +1,4 @@
 import flask
-from sqlalchemy import exc
 from hapi.dbmodels import Model
 from hapi import database
 
@@ -11,6 +10,8 @@ def _invalid_model_resp(ex):
 
 
 def _model_instantiated_resp():
+    # TODO: include a list of device's serial numbers
+    # TODO: where model is instantiated in the error reply
     return dict(message="model instantiated on some device(s), "
                         "unable to delete"), 400
 
@@ -68,20 +69,12 @@ def delete(modelId):
     if mod is None:
         return util.model_not_found_resp(modelId)
 
+    if len(mod.instances) > 0:
+        # model is instantiated on some device
+        return _model_instantiated_resp()
+
     session = database.db_session
     mod.delete(session)
-
-    try:
-        session.commit()
-    except exc.IntegrityError as e:
-        # we kind of assume, or rather, hope
-        # that the integrity error is triggered by the
-        # foreign key constrain violation, because there
-        # are some instances of this model,
-        # but we can't really be sure, as the exception is not
-        # that explicit why it's raised
-        # TODO: include a list of device's serial numbers
-        # TODO: where model is instantiated in the error reply
-        return _model_instantiated_resp()
+    session.commit()
 
     return flask.Response(status=204)

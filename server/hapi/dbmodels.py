@@ -134,6 +134,8 @@ class Model(Base):
     default_position_id = Column(ForeignKey("swerefPos.id"))
     default_position = orm.relationship("SwerefPos")
 
+    instances = orm.relationship("ModelInstance")
+
     def as_dict(self):
         d = dict(importStatus=self.import_status.name)
 

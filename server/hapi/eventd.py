@@ -4,8 +4,14 @@ import json
 import time
 from hapi.dbmodels import Device
 import requests
+from requests.exceptions import RequestException, HTTPError
+from requests.exceptions import ConnectionError, Timeout
+import threading
+from queue import Queue
 
 EVENTS_QUEUE = "events"
+SEND_RETRIES = 3
+RETRY_COOLDOWN = 1.5
 
 
 def do_maintenance():
@@ -24,7 +30,7 @@ def send_event(device, topic, restEndpoint, timestamp):
     """
     send the event to subscription's destination
     """
-    payload = {
+    body = {
         "topic": topic,
         "device": device,
         "timestamp": epoch2iso(timestamp)
@@ -33,9 +39,25 @@ def send_event(device, topic, restEndpoint, timestamp):
     headers = {}
     for header in restEndpoint.httpheaders:
         headers[header.name] = header.value
+    for _ in range(SEND_RETRIES):
+        if http_post_event(restEndpoint.url, headers, body):
+            break
 
-    r = requests.post(restEndpoint.url, json=payload, headers=headers)
-    print(r)
+
+def http_post_event(url, headers, body):
+    """
+    make a HTTP POST request to specified url
+
+    :return True of the POST was successfull, False on errors
+    """
+    try:
+        r = requests.post(url, json=body, headers=headers)
+        r.raise_for_status()
+        return True
+    except (RequestException, HTTPError, ConnectionError, Timeout) as e:
+        print("error POSTing to '%s': %s" % (url, e))
+
+    return False
 
 
 def dispatch_event(device, topic, payload, timestamp):
@@ -44,8 +66,8 @@ def dispatch_event(device, topic, payload, timestamp):
     for sub in subs:
         for subTopic in sub.topics:
             if subTopic.topic == topic:
-                print("send event: device %s, topic %s" % (device, topic))
                 send_event(device, topic, sub.restEndpoint, timestamp)
+            time.sleep(RETRY_COOLDOWN)
 
 
 def init_channel():
@@ -58,20 +80,35 @@ def init_channel():
 
 
 def parse_body(body):
+    # TODO: check that body is a valid event json,
+    # e.g. handle errors:
+    # - can't parse json
+    # - keys are missing
+    # handle by writing a warning and dropping the event
     ed = json.loads(body.decode("utf-8"))
     return ed["device"], ed["topic"], None, ed["timestamp"]
 
 
+def sender_thread(events_queue):
+    while True:
+        data = events_queue.get()
+        dispatch_event(*data)
+
+
 def main():
+    events_queue = Queue(maxsize=0)
     channel = init_channel()
+
+    t = threading.Thread(target=sender_thread, args=(events_queue,))
+    t.start()
 
     for msg in channel.consume(EVENTS_QUEUE, inactivity_timeout=400):
         if msg is None:
             do_maintenance()
             continue
-
         method, properties, body = msg
-        dispatch_event(*parse_body(body))
+        data = parse_body(body)
+        events_queue.put(data)
         channel.basic_ack(method.delivery_tag)
 
 

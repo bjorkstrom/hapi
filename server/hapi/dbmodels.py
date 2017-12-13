@@ -302,9 +302,13 @@ class RestEndpoint(Base):
 
             return headers
 
-        return RestEndpoint(url=data["URL"],
-                            method=data["method"],
-                            httpheaders=_get_headers())
+        args = dict(url=data["URL"],
+                    method=data["method"])
+
+        if "headers" in data:
+            args["httpheaders"] = _get_headers()
+
+        return RestEndpoint(**args)
 
     @staticmethod
     def get(restID):

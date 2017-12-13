@@ -387,7 +387,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    name = Column(Text, nullable=False)
+    name = Column(String(128), unique=True, nullable=False)
     password = Column(Text)
     note = Column(Text)
     wsTokenValue = Column(Integer, server_default="0", nullable=False)

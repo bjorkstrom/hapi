@@ -1,9 +1,8 @@
 import flask
-from flask import request
-from hapi.dbmodels import Model, User
+from hapi.dbmodels import Model
 from hapi import database
 
-from . import new_model, util
+from . import new_model, util, aws
 
 
 def _invalid_model_resp(ex):
@@ -21,11 +20,9 @@ def _model_instantiated_resp():
 # POST /models/new
 #
 def new(modelFile, model):
-    # figure out current user ID
-    usr_id = User.get(request.authorization.username).id
-
     try:
-        modID = new_model.add_model(modelFile, model, usr_id)
+        modID = new_model.add_model(modelFile, model,
+                                    util.get_user_id())
     except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
 
@@ -76,6 +73,9 @@ def delete(modelId):
     if len(mod.instances) > 0:
         # model is instantiated on some device
         return _model_instantiated_resp()
+
+    aws.delete_models_s3_objs(mod.id,
+                              util.get_user_id())
 
     session = database.db_session
     mod.delete(session)

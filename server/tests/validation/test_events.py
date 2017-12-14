@@ -1,36 +1,5 @@
 import unittest
-from .utils import Client, EventSubscription, EventFilter, RestEndpoint
-
-
-class SubscriptionMakerMixin:
-    def make_subscription(self):
-        endpoint = RestEndpoint(
-            URL="http://example.com/foo",
-            method="POST",
-            headers=[
-                dict(name="header1", value="val1"),
-                dict(name="header2", value="val2")]
-        )
-        subscription = EventSubscription(
-            duration=10,
-            eventFilters=[EventFilter(topic="topic1"),
-                          EventFilter(topic="topic2")],
-            destination={'restEndpoint': endpoint},
-        )
-        res = Client.device.post_device_serialNo_events_subscriptions_new(
-            serialNo="A0",
-            Subscription=subscription,
-
-        ).result()
-
-        self.subscriptionID = res.subscriptionID
-
-    def cancel_subscription(self):
-        dev = Client.device
-        dev.delete_device_serialNo_events_subscriptions_subscriptionID(
-            serialNo="A0",
-            subscriptionID=self.subscriptionID,
-        ).result()
+from .utils import Client, SubscriptionMakerMixin
 
 
 class TestSubscriptions(SubscriptionMakerMixin, unittest.TestCase):

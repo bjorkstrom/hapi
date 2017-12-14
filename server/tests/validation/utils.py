@@ -62,3 +62,38 @@ class ModelMakerMixin:
             modelId=self.modelId
         ).result()
         self.assertIsNone(res)
+
+
+class SubscriptionMakerMixin:
+    def make_subscription(self,
+                          dest_url="http://example.com/foo",
+                          headers=[],
+                          topics=["topic1", "topic2"],
+                          duration=10):
+        endpoint = RestEndpoint(
+            URL=dest_url,
+            method="POST",
+            headers=headers,
+        )
+
+        event_filters = [EventFilter(topic=t) for t in topics]
+
+        subscription = EventSubscription(
+            duration=duration,
+            eventFilters=event_filters,
+            destination={'restEndpoint': endpoint},
+        )
+        res = Client.device.post_device_serialNo_events_subscriptions_new(
+            serialNo="A0",
+            Subscription=subscription,
+
+        ).result()
+
+        self.subscriptionID = res.subscriptionID
+
+    def cancel_subscription(self):
+        dev = Client.device
+        dev.delete_device_serialNo_events_subscriptions_subscriptionID(
+            serialNo="A0",
+            subscriptionID=self.subscriptionID,
+        ).result()

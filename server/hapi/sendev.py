@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 
-import json
-import pika
 import sys
-import time
-
-EVENTS_QUEUE = "events"
+from hapi.event import amqp
 
 EVENTS = dict(
     online="Device/Online",
@@ -16,11 +12,6 @@ EVENTS = dict(
     inst_modified="ModelInstance/Modified",
     inst_removed="ModelInstance/Removed",
 )
-
-
-def timestamp():
-    epoch_time = time.time()
-    return epoch_time
 
 
 def generate_payload(event_name):
@@ -44,14 +35,13 @@ def generate_payload(event_name):
 
 def generate_event_json(device, event_name):
     ed = dict(device=device,
-              timestamp=timestamp(),
               topic=EVENTS[event_name])
 
     payload = generate_payload(event_name)
     if payload is not None:
         ed["payload"] = payload
 
-    return json.dumps(ed)
+    return ed
 
 
 def bail_out(msg):
@@ -66,20 +56,6 @@ def usage():
     return msg
 
 
-def send_event(device, event_name):
-    body = generate_event_json(device, event_name)
-
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters("localhost"))
-    channel = connection.channel()
-    channel.queue_declare(queue=EVENTS_QUEUE)
-    channel.basic_publish(exchange='',
-                          routing_key=EVENTS_QUEUE,
-                          body=body)
-
-    connection.close()
-
-
 if len(sys.argv) < 3:
     bail_out(usage())
 
@@ -89,4 +65,4 @@ if event_name not in EVENTS:
     bail_out("unknown event '%s', I know about %s" %
              (event_name, ", ".join(EVENTS)))
 
-send_event(device, event_name)
+amqp.send_event(generate_event_json(device, event_name))

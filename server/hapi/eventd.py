@@ -26,21 +26,25 @@ def epoch2iso(epoch):
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(epoch))
 
 
-def send_event(device, topic, restEndpoint, timestamp):
+def send_event(device, topic, restEndpoint, timestamp, payload):
     """
     send the event to subscription's destination
     """
-    body = {
+    request_body = {
         "topic": topic,
         "device": device,
         "timestamp": epoch2iso(timestamp)
     }
 
+    if payload is not None:
+        request_body["description"] = payload
+
     headers = {}
     for header in restEndpoint.httpheaders:
         headers[header.name] = header.value
+
     for _ in range(SEND_RETRIES):
-        if http_post_event(restEndpoint.url, headers, body):
+        if http_post_event(restEndpoint.url, headers, request_body):
             break
 
 
@@ -66,7 +70,7 @@ def dispatch_event(device, topic, payload, timestamp):
     for sub in subs:
         for subTopic in sub.topics:
             if subTopic.topic == topic:
-                send_event(device, topic, sub.restEndpoint, timestamp)
+                send_event(device, topic, sub.restEndpoint, timestamp, payload)
             time.sleep(RETRY_COOLDOWN)
 
 
@@ -86,7 +90,7 @@ def parse_body(body):
     # - keys are missing
     # handle by writing a warning and dropping the event
     ed = json.loads(body.decode("utf-8"))
-    return ed["device"], ed["topic"], None, ed["timestamp"]
+    return ed["device"], ed["topic"], ed.get("payload"), ed["timestamp"]
 
 
 def sender_thread(events_queue):

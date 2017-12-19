@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from hapi.dbmodels import Device
+from hapi.dbmodels import Device, User
 from hapi import database
 
 database.init_db()
@@ -18,5 +18,6 @@ for n in range(3):
 session.add(Device(serialNo="AAA000004"))
 session.add(Device(serialNo="XXX000001"))
 session.add(Device(serialNo="XXX000002"))
+session.add(User(name="tester", password=""))
 
 session.commit()

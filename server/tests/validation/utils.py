@@ -1,8 +1,19 @@
 import json
 from bravado.client import SwaggerClient
+from bravado.requests_client import RequestsClient
 
 
-Client = SwaggerClient.from_url("http://localhost:9090/v1/swagger.json")
+def _get_client():
+    host = "localhost"
+
+    http_client = RequestsClient()
+    http_client.set_basic_auth(host, "tester", "")
+    swagger_url = "http://%s:9090/v1/swagger.json" % host
+
+    return SwaggerClient.from_url(swagger_url,
+                                  http_client=http_client)
+
+Client = _get_client()
 
 
 ModelInstances = Client.get_model("ModelInstances")

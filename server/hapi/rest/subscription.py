@@ -41,9 +41,8 @@ def cancel(serialNo, subscriptionID):
     sub = dbmodels.Subscription.get(subscriptionID)
     if sub is None:
         return _invalid_subScription_resp(subscriptionID)
-    restEndpoint = sub.restEndpoint
-    database.db_session.delete(restEndpoint)
-
-    database.db_session.commit()
+    session = database.db_session
+    sub.delete(session)
+    session.commit()
 
     return flask.Response(status=204)

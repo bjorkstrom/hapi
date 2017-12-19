@@ -13,6 +13,7 @@ def _get_client():
     return SwaggerClient.from_url(swagger_url,
                                   http_client=http_client)
 
+
 Client = _get_client()
 
 

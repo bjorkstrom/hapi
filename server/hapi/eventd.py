@@ -2,12 +2,14 @@
 import pika
 import json
 import time
-from hapi.dbmodels import Device
+from hapi import database
+from hapi.dbmodels import Device, Subscription
 import requests
 from requests.exceptions import RequestException, HTTPError
 from requests.exceptions import ConnectionError, Timeout
 import threading
 from queue import Queue
+
 
 EVENTS_QUEUE = "events"
 SEND_RETRIES = 3
@@ -15,8 +17,13 @@ RETRY_COOLDOWN = 1.5
 
 
 def do_maintenance():
-    # maintenance hook, e.g. remove expired subscriptions, TBD
-    pass
+    #
+    # delete all expired subscriptions
+    #
+    session = database.db_session
+    for sub in Subscription.expired():
+        sub.delete(session)
+    session.commit()
 
 
 def epoch2iso(epoch):
@@ -106,7 +113,7 @@ def main():
     t = threading.Thread(target=sender_thread, args=(events_queue,))
     t.start()
 
-    for msg in channel.consume(EVENTS_QUEUE, inactivity_timeout=400):
+    for msg in channel.consume(EVENTS_QUEUE, inactivity_timeout=1):
         if msg is None:
             do_maintenance()
             continue

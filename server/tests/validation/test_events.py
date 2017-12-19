@@ -1,5 +1,18 @@
+import time
 import unittest
+from tests import settings
+from bravado.exception import HTTPNotFound
 from .utils import Client, SubscriptionMakerMixin
+
+
+def renew_subscription(subscriptionID):
+    r = Client.device.post_device_serialNo_events_subscriptions_subscriptionID(
+        serialNo=settings.TEST_DEVICE,
+        subscriptionID=subscriptionID,
+        subscription=dict(duration=10)
+    ).result()
+
+    return r
 
 
 class TestSubscriptions(SubscriptionMakerMixin, unittest.TestCase):
@@ -22,8 +35,18 @@ class TestSubscriptions(SubscriptionMakerMixin, unittest.TestCase):
         self.assertGreater(len(self.subscriptionID), 0)
 
     def test_renew(self):
-        Client.device.post_device_serialNo_events_subscriptions_subscriptionID(
-            serialNo="A0",
-            subscriptionID=self.subscriptionID,
-            subscription=dict(duration=10)
-        ).result()
+        renew_subscription(self.subscriptionID)
+
+
+class TestSubscriptionExpiration(SubscriptionMakerMixin, unittest.TestCase):
+    DURATION = 1
+
+    def setUp(self):
+        self.make_subscription(duration=self.DURATION)
+
+    def test_expired(self):
+        # give it an extra second to remove subscription
+        time.sleep(self.DURATION + 1)
+
+        with self.assertRaises(HTTPNotFound):
+            renew_subscription(self.subscriptionID)

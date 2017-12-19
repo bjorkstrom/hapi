@@ -320,6 +320,16 @@ class Subscription(Base):
         epoch_time = time.time()
         return duration + int(epoch_time)
 
+    @staticmethod
+    def expired():
+        """
+        get subscriptions that have expired
+        """
+        return Subscription.query.filter(Subscription.expiration < time.time())
+
+    def delete(self, session):
+        session.delete(self.restEndpoint)
+
 
 class RestEndpoint(Base):
     __tablename__ = "restEndpoints"

@@ -274,11 +274,19 @@ class Subscription(Base):
     @staticmethod
     def get(subId):
         return Subscription.query.filter(Subscription.id == subId).first()
-
+    
     @staticmethod
     def get_Expiration(duration):
         epoch_time = time.time()
         return duration + int(epoch_time)
+
+    @staticmethod
+    def expire():
+        return Subscription.query.filter(Subscription.expiration < time.time())
+
+    def delete(self, session):
+        rest=self.restEndpoint
+        session.delete(rest)
 
 
 class RestEndpoint(Base):

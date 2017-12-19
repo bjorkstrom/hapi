@@ -1,9 +1,6 @@
 import unittest
-import json
-import io
-
 from .. import settings
-from hapi.rest import models
+from hapi import database
 from hapi.rest import device
 from hapi.dbmodels import Model, SwerefPos, Device, ModelInstance
 
@@ -19,23 +16,26 @@ def _pos():
         }
 
 
-def _new_model_args(default_pos=True):
-    body = {
+def _new_model_dict(default_pos=True):
+    mod_dict = {
         "name": "test-model",
         "description": "my test model",
         "placement": "global",
     }
 
     if default_pos:
-        body["defaultPosition"] = _pos()
+        mod_dict["defaultPosition"] = _pos()
 
-    return io.BytesIO(b""), json.dumps(body)
+    return mod_dict
 
 
 def create_new_model(default_pos=True):
-    (body, http_status) = models.new(*_new_model_args(default_pos))
+    mod = Model.from_dict(_new_model_dict(default_pos))
 
-    return body["model"], http_status
+    database.db_session.add(mod)
+    database.db_session.commit()
+
+    return mod
 
 
 def instantiate_model(modelId, position=True):
@@ -72,15 +72,16 @@ class TestModel(unittest.TestCase):
         """
 
         # create model
-        (model_id, http_status) = create_new_model()
-        assert http_status == 201
+        model = create_new_model()
 
         # save default position ID for later checks
-        def_pos_id = Model.get(model_id).default_position.id
+        model_id = model.id
+        def_pos_id = Model.get(model.id).default_position.id
 
         # delete model
-        resp = models.delete(model_id)
-        assert resp.status_code == 204
+        session = database.db_session
+        model.delete(session)
+        session.commit()
 
         # check that both model and default position rows
         # have been deleted from the database
@@ -92,15 +93,16 @@ class TestModel(unittest.TestCase):
         create and delete a model without default position
         """
         # create model
-        (model_id, http_status) = create_new_model(default_pos=False)
-        assert http_status == 201
+        model = create_new_model(default_pos=False)
+        model_id = model.id
 
         # check that no default position was stored in the database
-        assert Model.get(model_id).default_position is None
+        assert model.default_position is None
 
         # delete model
-        resp = models.delete(model_id)
-        assert resp.status_code == 204
+        session = database.db_session
+        model.delete(session)
+        session.commit()
 
         # check that the model have been deleted from the database
         assert Model.get(model_id) is None
@@ -108,12 +110,12 @@ class TestModel(unittest.TestCase):
 
 class TestModelInstance(unittest.TestCase):
     def setUp(self):
-        (self.model_id, http_status) = create_new_model(default_pos=False)
-        assert http_status == 201
+        self.model = create_new_model(default_pos=False)
 
     def tearDown(self):
-        resp = models.delete(self.model_id)
-        assert resp.status_code == 204
+        session = database.db_session
+        self.model.delete(session)
+        session.commit()
 
     def test_del_instance_with_position(self):
         """
@@ -123,7 +125,7 @@ class TestModelInstance(unittest.TestCase):
         rows have been deleted
         """
         # create model instance
-        instantiate_model(self.model_id)
+        instantiate_model(self.model.id)
 
         dev = Device.get(settings.TEST_DEVICE)
         # there should be one model instance
@@ -149,7 +151,7 @@ class TestModelInstance(unittest.TestCase):
         """
 
         # create model instance
-        instantiate_model(self.model_id, position=False)
+        instantiate_model(self.model.id, position=False)
 
         dev = Device.get(settings.TEST_DEVICE)
         # there should be one model instance

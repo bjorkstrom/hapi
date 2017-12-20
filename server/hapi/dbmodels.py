@@ -29,6 +29,7 @@ class Device(Base):
 
     serialNo = Column(String(SERIAL_NO_LEN), primary_key=True)
     model_instances = orm.relationship("ModelInstance")
+    password = Column(Text)
 
     subscriptions = orm.relationship('Subscription',
                                      backref='sub',
@@ -410,3 +411,11 @@ class User(Base):
     @staticmethod
     def get(username):
         return User.query.filter(User.name == username).first()
+
+
+class Admin(Base):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(128), unique=True, nullable=False)
+    password = Column(Text)

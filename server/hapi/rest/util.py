@@ -12,6 +12,11 @@ def device_not_found_resp(serialNo):
     return dict(message=msg), 404
 
 
+def get_user():
+    # figure out current user ID
+    return User.get(request.authorization.username)
+
+
 def get_user_id():
     # figure out current user ID
-    return User.get(request.authorization.username).id
+    return get_user().id

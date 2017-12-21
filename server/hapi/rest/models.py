@@ -24,7 +24,7 @@ def _model_instantiated_resp():
 def new(modelFile, model):
     try:
         modID = new_model.add_model(modelFile, model,
-                                    util.get_user_id())
+                                    util.get_user())
     except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
 

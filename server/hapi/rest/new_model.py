@@ -104,15 +104,17 @@ def _publish_file(model_file, model_id, user_id):
     )
 
 
-def add_model(model_file, model, user_id):
+def add_model(model_file, model, user):
     mod_dict = _parse_model_json(model)
     _validate_model_dic(mod_dict)
 
     mod = Model.from_dict(mod_dict)
+    mod.uploader = user
+    mod.organization = user.organization
 
     database.db_session.add(mod)
     database.db_session.commit()
 
-    _publish_file(model_file, mod.id, user_id)
+    _publish_file(model_file, mod.id, user.id)
 
     return mod.id

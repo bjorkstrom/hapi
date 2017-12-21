@@ -1,6 +1,7 @@
 import flask
 from hapi.dbmodels import Device, ModelInstance, ModelNotFound
 from hapi import database
+from hapi import auth
 
 from . import util
 
@@ -8,6 +9,7 @@ from . import util
 #
 # POST /device/{serialNo}/models
 #
+@auth.user
 def post(serialNo, modelInstances):
     device = Device.get(serialNo)
     if device is None:
@@ -34,7 +36,10 @@ def post(serialNo, modelInstances):
 #
 # GET /device/{serialNo}/models
 #
+@auth.device
 def get(serialNo):
+    # TODO we should only give access to device's own models,
+    # right now device can access any other device's models
     device = Device.get(serialNo)
     if device is None:
         return util.device_not_found_resp(serialNo)

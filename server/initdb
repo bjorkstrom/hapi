@@ -1,23 +1,54 @@
 #!/usr/bin/env python
 
-from hapi.dbmodels import Device, User
+from hapi.dbmodels import Device, User, Organization
 from hapi import database
+import json
+
+
+DEV_CONF = """
+{"altitude":0,"BaseLongitudeSweref":-1,"BaseLatitudeSweref":-1,"BaseAltitudeRH2000":-9999,"BaseProjectionRef":"sweref_99_tm","AltitudeOffsetOverride":0,"LongitudeOffsetOverride":0,"LatitudeOffsetOverride":0,"GPSComPort":"com1","GPSNTripComPort":"com2","GPSUpdateRate":20,"CalibrationPitch":0,"CalibrationRoll":0,"CalibrationYaw":0,"CalibrationFOV":0,"CalibrationIPD":0,"CalibrationTOE":0,"CalibrationHeadCenterOffsetH":0.15,"CalibrationHeadCenterOffsetV":0.08,"CalibrationVerticalRotationAdjustment":0,"NCalibrationIMUSteadyThresh":4,"NCalibrationGPSSamplesThresh":350,"NCalibrationIMUCorrectionHistory":1,"NCalibrationOrthogonalRegression":0.15,"NCalibrationMinDistance":4,"NCalibrationRecurring":30,"GPSUser":728601572,"GPSPass":"testpass","GPSNrtkIP":"192.71.190.141","GPSNrtkPort":"8500","GPSMountingPoint":"RTCM3_GNSS","GPSDataFormat":"RTCM 3.1","GeoidFilePath":"SWEN08_RH2000.dat","CameraMaxExposure":16000,"CameraGamma":0.3}
+"""
 
 database.init_db()
+
+session = database.db_session
+
+#
+# create organizations
+#
+brabOrg = Organization(name="BRAB")
+session.add(brabOrg)
+
+JLOrg = Organization(name="Justice League")
+session.add(JLOrg)
 
 #
 # create a some devices
 #
-session = database.db_session
+
 
 # some devices with short serial numbers
 for n in range(3):
-    session.add(Device(serialNo="A%s" % n))
+    session.add(
+        Device(serialNo="A%s" % n,
+               password="$2y$10$RQRrG/hnB0Gf.sBxcnfZpuFhd7VAYjHMOLk.fttYCLnzpcEflBpMC", # testpass
+               organization=brabOrg,
+               configuration=DEV_CONF))
 
 # a couple of devices with 'real' serial numbers
 session.add(Device(serialNo="AAA000004"))
 session.add(Device(serialNo="XXX000001"))
 session.add(Device(serialNo="XXX000002"))
-session.add(User(name="tester", password=""))
+session.add(User(name="tester",
+                 organization=brabOrg,
+                 password=""))
+session.add(User(name="root",
+                 organization=brabOrg,
+                 password="$2y$10$NVKWoLlAUye96v4Up1VRyO.Cl.7bPWTu9h4CnBnvj59Pc6i1WuqQu")) # pass
+
+session.add(User(name="hulk",
+                 organization=JLOrg,
+                 password="$2y$10$NVKWoLlAUye96v4Up1VRyO.Cl.7bPWTu9h4CnBnvj59Pc6i1WuqQu")) # pass
+
 
 session.commit()

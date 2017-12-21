@@ -30,6 +30,10 @@ class Device(Base):
     serialNo = Column(String(SERIAL_NO_LEN), primary_key=True)
     model_instances = orm.relationship("ModelInstance")
     password = Column(Text)
+    configuration = Column(Text)
+
+    _organization = Column("orgID", ForeignKey("organizations.id"))
+    organization = orm.relationship("Organization")
 
     subscriptions = orm.relationship('Subscription',
                                      backref='sub',
@@ -139,6 +143,12 @@ class Model(Base):
 
     default_position_id = Column(ForeignKey("swerefPos.id"))
     default_position = orm.relationship("SwerefPos")
+
+    _organization = Column("orgID", ForeignKey("organizations.id"))
+    organization = orm.relationship("Organization")
+
+    _uploader = Column("uploader", ForeignKey("users.id"))
+    uploader = orm.relationship("User")
 
     instances = orm.relationship("ModelInstance")
     #
@@ -398,6 +408,14 @@ class EventTopics(Base):
         return EventTopics(topic=data["topic"])
 
 
+class Firmware(Base):
+    __tablename__ = "firmware"
+
+    device = Column("device", ForeignKey("devices.serialNo"), primary_key=True)
+    current = Column(Text)
+    requested = Column(Text)
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -405,12 +423,24 @@ class User(Base):
     name = Column(String(128), unique=True, nullable=False)
     password = Column(Text)
     note = Column(Text)
+
+    _organization = Column("orgID", ForeignKey("organizations.id"))
+    organization = orm.relationship("Organization")
+
     wsTokenValue = Column(Integer, server_default="0", nullable=False)
     wsTokenExpiration = Column(Integer, server_default="0", nullable=False)
 
     @staticmethod
     def get(username):
         return User.query.filter(User.name == username).first()
+
+
+class Organization(Base):
+    __tablename__ = "organizations"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text, nullable=False)
+    note = Column(Text)
 
 
 class Admin(Base):

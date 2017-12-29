@@ -10,6 +10,14 @@ def _invalid_model_resp(ex):
     return dict(message=str(ex)), 400
 
 
+def _invalid_model_ext(ex):
+    msg = "Unsupported model source file type '%s', " \
+          "supprted types are: %s" % \
+           (ex.ext, ", ".join(new_model.MODEL_SRC_EXT))
+
+    return dict(message=msg), 415
+
+
 def _model_instantiated_resp():
     # TODO: include a list of device's serial numbers
     # TODO: where model is instantiated in the error reply
@@ -27,6 +35,8 @@ def new(modelFile, model):
                                     util.get_user())
     except new_model.InvalidModel as e:
         return _invalid_model_resp(e)
+    except new_model.InvalidModelExtension as e:
+        return _invalid_model_ext(e)
 
     return dict(model=str(modID)), 201
 

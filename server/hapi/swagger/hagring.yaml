@@ -36,6 +36,11 @@ paths:
           description: Error parsing request body
           schema:
             $ref: "#/definitions/ErrorResponse"
+        415:
+          description: Unsupported model source file type
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+
   /models:
     get:
       summary: get all uploaded model's IDs

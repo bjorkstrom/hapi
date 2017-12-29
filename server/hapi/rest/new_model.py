@@ -12,11 +12,17 @@ from hapi import database
 from jsonschema.exceptions import ValidationError
 from hapi import config
 
-MODEL_FILE_DIR = "model_files"
+# supported model source file extensions
+MODEL_SRC_EXT = ["zip", "ifc", "fbx", "dae", "unity3d"]
 
 
 class InvalidModel(Exception):
     pass
+
+
+class InvalidModelExtension(Exception):
+    def __init__(self, ext):
+        self.ext = ext
 
 #
 # We use an external json schema file to validate
@@ -84,10 +90,12 @@ def _sqs_msg(model_id, user_id, mod_file_ext):
 
 
 def _publish_file(model_file, model_id, user_id):
-
     _, ext = path.splitext(model_file.filename)
     if ext.startswith("."):
         ext = ext[1:]
+
+    if ext not in MODEL_SRC_EXT:
+        raise InvalidModelExtension(ext)
 
     s3_client = boto3.client("s3")
     s3_client.upload_fileobj(model_file,

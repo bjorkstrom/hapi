@@ -78,7 +78,7 @@ class ModelInstance(Base):
     _model_id = Column("model", ForeignKey("models.id"))
     model = orm.relationship("Model")
 
-    _position_id = Column("position", ForeignKey("swerefPos.id"))
+    _position_id = Column("position", ForeignKey("sweref_pos.id"))
     position = orm.relationship("SwerefPos")
 
     _device = Column("device", ForeignKey("devices.serialNo"))
@@ -148,7 +148,7 @@ class Model(Base):
     name = Column(String(128))
     description = Column(String(256))
 
-    default_position_id = Column(ForeignKey("swerefPos.id"))
+    default_position_id = Column(ForeignKey("sweref_pos.id"))
     default_position = orm.relationship("SwerefPos")
 
     _organization = Column("orgID", ForeignKey("organizations.id"))
@@ -246,7 +246,7 @@ class Model(Base):
 
 
 class SwerefPos(Base):
-    __tablename__ = "swerefPos"
+    __tablename__ = "sweref_pos"
 
     # 15 max total digit include decimals
     # 5 max digits after the decimal point
@@ -303,7 +303,7 @@ class Subscription(Base):
     device = orm.relationship("Device")
 
     _restEndpoint = Column("restEndpoint",
-                           ForeignKey("restEndpoints.id", ondelete="CASCADE"))
+                           ForeignKey("rest_endpoints.id", ondelete="CASCADE"))
     restEndpoint = orm.relationship("RestEndpoint")
     topics = orm.relationship('EventTopics',
                               backref='owner',
@@ -350,7 +350,7 @@ class Subscription(Base):
 
 
 class RestEndpoint(Base):
-    __tablename__ = "restEndpoints"
+    __tablename__ = "rest_endpoints"
 
     id = Column(Integer, primary_key=True)
     url = Column(String(256))
@@ -384,12 +384,12 @@ class RestEndpoint(Base):
 
 
 class HttpHeader(Base):
-    __tablename__ = "httpHeaders"
+    __tablename__ = "http_headers"
 
     name = Column(String(64), primary_key=True)
     value = Column(String(256))
     _restEndpoints = Column("restEndpoint",
-                            ForeignKey("restEndpoints.id",
+                            ForeignKey("rest_endpoints.id",
                                        ondelete="CASCADE"),
                             primary_key=True)
     restEndpoint = orm.relationship("RestEndpoint")
@@ -401,7 +401,7 @@ class HttpHeader(Base):
 
 
 class EventTopics(Base):
-    __tablename__ = "topicEvents"
+    __tablename__ = "event_topics"
 
     topic = Column(String(64), primary_key=True)
     _subscription = Column("subscription",

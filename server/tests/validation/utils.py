@@ -65,7 +65,7 @@ class ModelMakerMixin:
     def create_model(self):
         model_str = get_new_model_json(
             self.MOD_NAME, self.MOD_DESK, self.DEF_POS)
-        res = Client.models.post_models_new(modelFile="dummy_data",
+        res = Client.models.post_models_new(modelFile=("foo.fbx", "data"),
                                             model=model_str).result()
         self.modelId = res["model"]
 

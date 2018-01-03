@@ -53,7 +53,6 @@ def flask_req_mock():
 
 
 def instantiate_model(modelId, position=True):
-
     d = {
         "modelInstances": [
             {
@@ -126,7 +125,7 @@ class TestModel(unittest.TestCase):
 @mock.patch("flask.request", flask_req_mock())
 class TestModelInstance(unittest.TestCase):
     def setUp(self):
-        self.model = create_new_model(default_pos=False)
+        self.model = create_new_model()
 
     def tearDown(self):
         session = database.db_session
@@ -176,7 +175,6 @@ class TestModelInstance(unittest.TestCase):
         # save instance and position ID for later checks
         mod_inst = dev.model_instances[0]
         inst_id = mod_inst.id
-        assert mod_inst.position is None
 
         # delete model instance
         del_model_instances()

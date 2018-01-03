@@ -1,5 +1,17 @@
-from hapi.dbmodels import User
+from hapi.dbmodels import User, ModelNotFound, NoModelInstancePosition
 from flask import request
+
+
+def model_instance_error_resp(ex):
+    if isinstance(ex, ModelNotFound):
+        return model_not_found_resp(ex.modelId)
+
+    if isinstance(ex, NoModelInstancePosition):
+        msg = "no position specified for model '%s' " \
+              "and no implicit position is known for that model" % ex.modelId
+        return dict(message=msg), 400
+
+    assert False, "unexpected exception type"
 
 
 def model_not_found_resp(modelId):

@@ -1,5 +1,5 @@
 import flask
-from hapi.dbmodels import Device, ModelInstance, ModelNotFound
+from hapi.dbmodels import Device, ModelInstance, ModelException
 from hapi import database
 from hapi import auth
 
@@ -24,9 +24,9 @@ def post(serialNo, modelInstances):
     try:
         for mod_inst in modelInstances["modelInstances"]:
             session.add(ModelInstance.from_dict(device, mod_inst))
-    except ModelNotFound as e:
+    except ModelException as e:
         session.expunge_all()  # don't write any changes to the database
-        return util.model_not_found_resp(e.modelId)
+        return util.model_instance_error_resp(e)
 
     session.commit()
 

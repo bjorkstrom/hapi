@@ -17,9 +17,17 @@ SWRREF99 = "sweref99"
 DEF_POS = "defaultPosition"
 
 
-class ModelNotFound(Exception):
+class ModelException(Exception):
     def __init__(self, modelId):
         self.modelId = modelId
+
+
+class ModelNotFound(ModelException):
+    pass
+
+
+class NoModelInstancePosition(ModelException):
+    pass
 
 
 class Device(Base):
@@ -108,8 +116,7 @@ class ModelInstance(Base):
             if mod.default_position is not None:
                 return mod.default_position.copy()
 
-            # position not known for this instance at this time
-            return None
+            raise NoModelInstancePosition(mod.id)
 
         modId = data[MODEL]
         mod = Model.get(modId)

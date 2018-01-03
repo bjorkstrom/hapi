@@ -145,6 +145,10 @@ paths:
       responses:
         204:
           description: model instances successfully created
+        400:
+          description: no position specified for a model without implicit position
+          schema:
+            $ref: "#/definitions/ErrorResponse"
         404:
           description: device or model not found
           schema:

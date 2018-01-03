@@ -107,3 +107,26 @@ class TestDelUsedModel(utils.ModelMakerMixin,
             self.delete_model().result()
 
         self._assert_error_msg_contains(cm.exception, "model instantiated on")
+
+
+class TestModelInstanceNoPosition(utils.ModelMakerMixin,
+                                  utils.ErrorReqMixin,
+                                  unittest.TestCase):
+    def setUp(self):
+        self.create_model(default_pos=False)
+
+    def tearDown(self):
+        self.delete_model()
+
+    def test_inst_no_position(self):
+        mod_insts = ModelInstances(modelInstances=[
+            ModelInstance(name="inst0",
+                          model=self.modelId),
+        ])
+
+        with self.assertRaises(HTTPBadRequest) as cm:
+            Client.device.post_device_serialNo_models(
+                serialNo=settings.TEST_DEVICE,
+                modelInstances=mod_insts).result()
+
+        self._assert_error_msg_contains(cm.exception, "no position specified")

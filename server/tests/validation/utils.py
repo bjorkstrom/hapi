@@ -42,8 +42,11 @@ def get_new_model_json(name, description, position):
         "name": name,
         "description": description,
         "placement": "global",
-        "defaultPosition": {"sweref99": position.sweref99},
     }
+
+    if position is not None:
+        md["defaultPosition"] = {"sweref99": position.sweref99}
+
     return json.dumps(md)
 
 
@@ -62,9 +65,12 @@ class ModelMakerMixin:
         }
     )
 
-    def create_model(self):
+    def create_model(self, default_pos=True):
+        pos = self.DEF_POS if default_pos else None
+
         model_str = get_new_model_json(
-            self.MOD_NAME, self.MOD_DESK, self.DEF_POS)
+            self.MOD_NAME, self.MOD_DESK, pos)
+
         res = Client.models.post_models_new(modelFile=("foo.fbx", "data"),
                                             model=model_str).result()
         self.modelId = res["model"]

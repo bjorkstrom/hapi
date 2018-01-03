@@ -1,0 +1,25 @@
+Configuration
+-------------
+
+Before the tests can be run, you need to:
+
+ * install pytest package (pip install pytest)
+ * create settings.py file in this directory,
+    - copy settings.py-example to settings.py
+    - make sure settings.py contains correct credentials
+
+
+Running tests
+-------------
+
+Use 'pytest' command to run tests. Example:
+
+ # run all tests
+ $ pytest
+
+ # run all tests in unit/ directory
+ $ pytest unit/
+
+ # run one specific test
+ pytest unit/test_db.py::TestModel::test_del_with_default_pos
+

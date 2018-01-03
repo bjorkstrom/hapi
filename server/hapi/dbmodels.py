@@ -124,8 +124,8 @@ class ModelInstance(Base):
             raise ModelNotFound(modId)
 
         return ModelInstance(
-            name=data.get(NAME),
-            description=data.get(DESC),
+            name=data.get(NAME, mod.name),
+            description=data.get(DESC, mod.description),
             hidden=data.get(HIDDEN, False),
             model=mod,
             device=device,

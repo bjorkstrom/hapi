@@ -67,11 +67,32 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
     """
     Test model instances API requests
     """
+    INST_NAME = "test instance"
+    INST_DESK = "instance description"
+    INST_POS = utils.Position(
+        sweref99={
+            "projection": "13 30",
+            "x": 1.0,
+            "y": 2.0,
+            "z": 3.0,
+            "yaw": 4.0,
+            "roll": 5.0,
+            "pitch": 6.0,
+        }
+    )
+
     def create_instances(self):
         mod_insts = ModelInstances(modelInstances=[
-            ModelInstance(name="inst0",
-                          model=self.modelId),
-            ModelInstance(name="inst1",
+
+            # first instance should inherit it's name,
+            # description and position from the model
+            ModelInstance(model=self.modelId),
+
+            # second instance overrides model's name,
+            # description and position
+            ModelInstance(name=self.INST_NAME,
+                          description=self.INST_DESK,
+                          position=self.INST_POS,
                           model=self.modelId),
         ])
         Client.device.post_device_serialNo_models(
@@ -100,12 +121,23 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
         ).result()
 
         instances = [
+            # first instance should have values from the model
             ModelInstance(
-                name="inst%s" % n,
+                name=self.MOD_NAME,
+                description=self.MOD_DESK,
+                position=self.DEF_POS,
                 hidden=False,
                 model=self.modelId,
-                position=self.DEF_POS,
-            ) for n in range(2)]
+            ),
+            # second instance should override values
+            ModelInstance(
+                name=self.INST_NAME,
+                description=self.INST_DESK,
+                hidden=False,
+                model=self.modelId,
+                position=self.INST_POS,
+            ),
+        ]
         self.assertEqual(res, ModelInstances(modelInstances=instances))
 
     def test_update(self):
@@ -126,6 +158,7 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
         ).result()
         self.assertEqual(res, ModelInstances(modelInstances=[ModelInstance(
                 name="new_inst",
+                description=self.MOD_DESK,
                 hidden=False,
                 model=self.modelId,
                 position=self.DEF_POS,

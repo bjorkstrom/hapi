@@ -1,0 +1,6 @@
+# device to use for tests
+TEST_DEVICE = "A0"
+
+# user to use for the tests
+TEST_USER = "tester"
+TEST_PASSWD = "xxxx"

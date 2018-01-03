@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 from .. import settings
 from hapi import database
 from hapi.rest import device
@@ -38,7 +39,21 @@ def create_new_model(default_pos=True):
     return mod
 
 
+def flask_req_mock():
+    """
+    Create a moock or flask.request object,
+    with authorization set to test user's credentials
+    :return:
+    """
+    req = mock.Mock()
+    req.authorization.username = settings.TEST_USER
+    req.authorization.password = settings.TEST_PASSWD
+
+    return req
+
+
 def instantiate_model(modelId, position=True):
+
     d = {
         "modelInstances": [
             {
@@ -108,6 +123,7 @@ class TestModel(unittest.TestCase):
         assert Model.get(model_id) is None
 
 
+@mock.patch("flask.request", flask_req_mock())
 class TestModelInstance(unittest.TestCase):
     def setUp(self):
         self.model = create_new_model(default_pos=False)

@@ -98,6 +98,7 @@ class TestInstances(unittest.TestCase, utils.ModelMakerMixin):
         res = Client.device.get_device_serialNo_models(
             serialNo=settings.TEST_DEVICE
         ).result()
+
         instances = [
             ModelInstance(
                 name="inst%s" % n,

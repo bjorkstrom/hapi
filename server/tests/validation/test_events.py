@@ -1,6 +1,6 @@
 import time
 import unittest
-from tests import settings
+from .. import settings
 from bravado.exception import HTTPNotFound
 from .utils import Client, SubscriptionMakerMixin
 

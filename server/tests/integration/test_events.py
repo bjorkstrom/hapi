@@ -4,10 +4,9 @@ import unittest
 
 from dateutil import parser
 from hapi.event import amqp
-from tests.integration import restdest
-
-from tests.validation import utils
-from tests import settings
+from . import restdest
+from ..validation import utils
+from .. import settings
 
 
 class TestSubscriptions(utils.SubscriptionMakerMixin, unittest.TestCase):

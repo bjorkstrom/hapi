@@ -21,14 +21,14 @@ def upload_model_body(filename):
         "name": filename,
         "description": "my pretty model",
         "placement" : "global",
-        # "defaultPosition": {
-        #     "sweref99": {
-        #         "projection": "18 00",
-        #         "x": 6175471.9873,
-        #         "y": 300000.1234,
-        #         "z": 68.0223,
-        #     },
-        # },
+        "defaultPosition": {
+            "sweref99": {
+                "projection": "18 00",
+                "x": 6175471.9873,
+                "y": 300000.1234,
+                "z": 68.0223,
+            },
+        },
     }
     return json.dumps(body)
 
@@ -73,6 +73,7 @@ class HagringCloud:
 
         self.ModelInstance = self.client.get_model("ModelInstance")
         self.ModelInstances = self.client.get_model("ModelInstances")
+        self.Position = self.client.get_model("Position")
 
 
 
@@ -101,10 +102,27 @@ class HagringCloud:
         print(r.status_code, r.json())
 
     def setModelInstances(self, device_serno, instances):
-        mis = [self.ModelInstance(model=mid) for mid in instances]
+        pos = self.Position(
+            sweref99={
+                "projection": "18 00",
+                "x": 1.0,
+                "y": 2.0,
+                "z": 3.0,
+                "yaw": 0.0,
+                "roll": 0.0,
+                "pitch": 0.0,
+            }
+        )
+
+        #mis = [self.ModelInstance(model=mid) for mid in instances]
+        mis = [
+            self.ModelInstance(model=instances[0], position=pos),
+            self.ModelInstance(model=instances[1]),
+        ]
         mis = self.ModelInstances(modelInstances=mis)
 
-        r = self.client.device.post_device_serialNo_models(serialNo="A0", modelInstances=mis).result()
+        r = self.client.device.post_device_serialNo_models(
+            serialNo=device_serno, modelInstances=mis).result()
         print(r)
 
     def getModelInstances(self, device_serno):

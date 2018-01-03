@@ -3,8 +3,8 @@
 import hagring
 
 HC = hagring.HagringCloud(
-#    "http://localhost:9090",
-    "https://ncc.brab.ws",
+    "http://localhost:9090",
+#    "https://ncc.brab.ws",
                           uname="root",
 #                          uname="hulk",
                           passwd="pass",
@@ -22,8 +22,7 @@ class HelpCommand:
 
 class NewModel:
     def __call__(self, mod, *args):
-        mid = HC.newModel(mod)
-        print("new model %s" % mid)
+        HC.newModel(mod)
 
     def help(self):
         return "upload new model"

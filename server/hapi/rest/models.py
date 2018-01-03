@@ -28,7 +28,7 @@ def _model_instantiated_resp():
 #
 # POST /models/new
 #
-@auth.user
+@auth.allow(auth.user)
 def new(modelFile, model):
     try:
         modID = new_model.add_model(modelFile, model,
@@ -44,7 +44,7 @@ def new(modelFile, model):
 #
 # GET /models
 #
-@auth.user
+@auth.allow(auth.user)
 def search():
     models = [dict(model=str(m.id)) for m in Model.all()]
     return dict(models=models)
@@ -53,7 +53,7 @@ def search():
 #
 # PUT /models/{modelId}
 #
-@auth.user
+@auth.allow(auth.user)
 def put(modelId, modelUpdate):
     mod = Model.get(modelId)
     if mod is None:
@@ -68,7 +68,7 @@ def put(modelId, modelUpdate):
 #
 # GET /models/{modelId}
 #
-@auth.user
+@auth.allow(auth.user)
 def get(modelId):
     mod = Model.get(modelId)
     if mod is None:
@@ -80,7 +80,7 @@ def get(modelId):
 #
 # DELETE /models/{modelId}
 #
-@auth.user
+@auth.allow(auth.user)
 def delete(modelId):
     mod = Model.get(modelId)
     if mod is None:

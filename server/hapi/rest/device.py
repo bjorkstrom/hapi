@@ -9,7 +9,7 @@ from . import util
 #
 # POST /device/{serialNo}/models
 #
-@auth.user
+@auth.allow(auth.user)
 def post(serialNo, modelInstances):
     device = Device.get(serialNo)
     if device is None:
@@ -36,7 +36,7 @@ def post(serialNo, modelInstances):
 #
 # GET /device/{serialNo}/models
 #
-@auth.device
+@auth.allow(auth.user, auth.device)
 def get(serialNo):
     # TODO we should only give access to device's own models,
     # right now device can access any other device's models

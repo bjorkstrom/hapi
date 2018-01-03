@@ -12,7 +12,6 @@ setuptools.setup(
         "pika==0.11.2",
         "PyMySQL==0.7.11",
         "boto3==1.4.8",
-        "decorator==4.1.2",
         "bcrypt==3.1.4",
     ],
 )

@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+
+import hagring
+
+HC = hagring.HagringCloud(
+#    "http://localhost:9090",
+    "https://ncc.brab.ws",
+                          uname="root",
+#                          uname="hulk",
+                          passwd="pass",
+                          )
+
+
+class HelpCommand:
+    def __call__(self, *args):
+        for cmd, imp in COMMANDS.items():
+            print("%s - %s" % (cmd, imp.help()))
+
+    def help(self):
+        return "list all commands"
+
+
+class NewModel:
+    def __call__(self, mod, *args):
+        mid = HC.newModel(mod)
+        print("new model %s" % mid)
+
+    def help(self):
+        return "upload new model"
+
+
+class UpdateModel:
+    def __call__(self, id, name, desc, *args):
+        HC.updateModel(id, name, desc)
+
+    def help(self):
+        return "update model"
+
+
+class GetModel:
+    def __call__(self, id, *args):
+        HC.getModel(id)
+
+    def help(self):
+        return "get model"
+
+
+class DeleteModel:
+    def __call__(self, id, *args):
+        HC.deleteModel(id)
+
+    def help(self):
+        return "delete model"
+
+
+class SetModelInstances:
+    def __call__(self, device, *args):
+        HC.setModelInstances(device, list(args))
+
+    def help(self):
+        return "set model instances"
+
+class GetModelInstances:
+    def __call__(self, device, *args):
+        HC.getModelInstances(device)
+
+    def help(self):
+        return "get model instances"
+
+COMMANDS = dict(
+    help=HelpCommand(),
+    nm=NewModel(),
+    um=UpdateModel(),
+    gm=GetModel(),
+    dm=DeleteModel(),
+    smi=SetModelInstances(),
+    gmi=GetModelInstances(),
+)
+
+
+def handle_command(cmd, *args):
+    if cmd not in COMMANDS:
+        print("unknown command '%s'" % cmd)
+        return
+    COMMANDS[cmd](*args)
+
+
+try:
+    while True:
+        cmd_parts = input("hac> ").split()
+        if len(cmd_parts) < 1:
+            # ignore empty commands
+            continue
+
+        cmd, *args = cmd_parts
+        handle_command(cmd, *args)
+
+except EOFError:
+    # handle exit gracefully, e.g.
+    # don't print traceback
+    pass
+
+
+
